@@ -2,1087 +2,484 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>修仙选择剧情跳转（完整版·修复优化）</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no, email=no, address=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta property="og:title" content="青岚宗秘境 - 修仙道途抉择">
+    <meta property="og:description" content="双秘术抉择，仙魔殊途，你的选择决定万古结局！">
+    <meta property="og:image" content="https://picsum.photos/id/1048/800/450">
+    <meta property="og:type" content="game">
+    <title>青岚宗秘境 · 三生道途抉择</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        .select-step { margin: 20px 0; }
-        .option { 
-            padding: 8px 16px; 
-            background: #f5f5f5; 
-            margin: 5px; 
-            cursor: pointer; 
-            display: inline-block; 
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-        .option:hover { background: #e0e0e0; transform: translateY(-2px); }
-        .option.selected { background: #2196f3; color: white; box-shadow: 0 2px 4px rgba(33,150,243,0.3); }
-        h3 { 
-            color: #333; 
-            border-left: 4px solid #2196f3; 
-            padding-left: 10px; 
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        /* 页面主标题 */
-        .main-title {
-            text-align: center;
-            color: #1976d2;
-            margin: 20px 0;
-            font-size: 24px;
-            text-shadow: 0 2px 4px rgba(25,118,210,0.2);
-        }
-
-        /* 仙侠背景样式 */
-        body { 
-            padding: 20px; 
-            font-family: "Microsoft YaHei", "PingFang SC", sans-serif; 
-            background: url('https://picsum.photos/id/1040/1920/1080') no-repeat center center fixed; 
-            background-size: cover;
-            position: relative;
-            margin: 0;
+        body {
             min-height: 100vh;
+            padding: 0;
+            font-family: "微软雅黑", "PingFang SC", "Helvetica Neue", sans-serif;
+            /* 初始仙侠背景图 */
+            background: url('https://picsum.photos/id/1031/1920/1080') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            color: #2c3e50;
+            -webkit-font-smoothing: antialiased;
+            /* 背景平滑切换动画 */
+            transition: background 0.8s ease-in-out;
         }
-        body::before {
-            content: "";
+        /* 天魔策-暗红宗门背景 */
+        body.bg-tianmo {
+            background: url('https://picsum.photos/id/1043/1920/1080') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        /* 星河令-星辰仙侠背景 */
+        body.bg-xinghe {
+            background: url('https://picsum.photos/id/1023/1920/1080') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        /* 长生诀-仙门古风背景 */
+        body.bg-changsheng {
+            background: url('https://picsum.photos/id/1036/1920/1080') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        /* 网易云音乐播放器 - 悬浮右上角不遮挡内容 */
+        .music-player {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.85); 
-            z-index: -1;
-        }
-
-        /* 弹窗样式 - 新增淡入动画 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            animation: modalFadeIn 0.3s ease;
-        }
-        @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
-        }
-        .close-modal {
-            position: absolute;
             top: 10px;
-            right: 20px;
+            right: 10px;
+            z-index: 9999;
+            width: 120px;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+        /* 手机安全区适配 - 避免内容被刘海屏遮挡 */
+        .status-bar {
+            height: constant(safe-area-inset-top);
+            height: env(safe-area-inset-top);
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+        }
+        /* 主容器 - 半透明保证文字清晰 */
+        .container {
+            width: 100%;
+            min-height: calc(100vh - constant(safe-area-inset-top));
+            min-height: calc(100vh - env(safe-area-inset-top));
+            padding: 20px 15px;
+            background: rgba(255,255,255,0.92);
+            margin-top: 5px;
+            border-radius: 12px 12px 0 0;
+        }
+        h2 {
+            text-align: center;
             font-size: 24px;
+            margin: 10px 0 20px;
+            padding: 0 10px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        /* 剧情步骤 - 默认隐藏，激活显示 */
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+        /* 步骤切换淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 通用选项按钮 */
+        .option {
+            padding: 18px 20px;
+            margin: 15px 0;
+            background: #ecf0f1;
+            border-radius: 10px;
             cursor: pointer;
-            color: #666;
-            user-select: none;
-            transition: color 0.2s;
-        }
-        .close-modal:hover {
-            color: #ff0000;
-        }
-        .modal h4 {
-            color: #2196f3;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-top: 0;
-            font-size: 18px;
-        }
-        .modal-detail {
-            line-height: 1.8;
-            color: #333;
-            font-size: 15px;
-            padding-top: 10px;
-        }
-
-        /* 回退按钮样式 - 扩大点击区域 */
-        .back-btn {
-            margin: 10px 0;
-            padding: 10px 20px;
-            background-color: #f44336;
-            color: white;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            line-height: 1.6;
             border: none;
-            border-radius: 4px;
+            width: 100%;
+            text-align: left;
+        }
+        .option:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(52, 152, 219, 0.3);
+        }
+        /* 返回/重置按钮 */
+        .back-btn, .reset-btn {
+            padding: 12px 25px;
+            margin: 20px 5px 10px;
+            border: none;
+            border-radius: 8px;
+            background: #e74c3c;
+            color: white;
             cursor: pointer;
-            font-size: 14px;
-            font-family: "Microsoft YaHei";
-            transition: background-color 0.2s;
+            font-size: 16px;
+            transition: background 0.2s ease;
             display: inline-block;
         }
-        .back-btn:hover {
-            background-color: #d32f2f;
+        .back-btn:hover, .reset-btn:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
         }
-
-        /* 剧情介绍样式 */
-        .story-intro {
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            border-radius: 6px;
-            margin: 10px 0 20px;
-            border-left: 4px solid #ff9800;
-            line-height: 1.7;
-            color: #555;
-            font-size: 14px;
-        }
-        .story-intro h4 {
-            margin: 0 0 8px 0;
-            color: #ff9800;
-            font-size: 16px;
-        }
-
-        /* 剧情选择步骤样式 */
-        .plot-choice-step {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: rgba(33, 150, 243, 0.1);
-            border-radius: 6px;
-            display: none;
-        }
-        .plot-choice-step h3 {
-            color: #1976d2;
-            border-left-color: #1976d2;
-        }
-        .plot-option {
-            padding: 12px 20px;
-            background: #e3f2fd;
-            margin: 8px 0;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-        .plot-option:hover {
-            background: #bbdefb;
-            transform: translateX(5px);
-            border-left-color: #1976d2;
-        }
-        /* 新增剧情选项选中样式 */
-        .plot-option.selected {
-            background: #90caf9;
-            border-left-color: #1976d2;
-            transform: translateX(3px);
-        }
-
-        /* 自动跳转提示样式 - 居中显示，优化字体 */
-        .jump-tip {
-            color: #f44336;
-            font-size: 15px;
+        /* 剧情文本框 */
+        .plot-text {
+            line-height: 2.2;
             margin: 15px 0;
-            font-weight: bold;
-            text-align: center;
-            padding: 10px;
-            background: rgba(244,67,54,0.1);
-            border-radius: 4px;
+            padding: 15px 18px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #2c3e50;
+            text-align: justify;
         }
-
-        /* 移动端适配媒体查询 */
-        @media (max-width: 768px) {
-            body { padding: 15px; }
-            .option { display: block; margin: 8px 0; text-align: center; }
-            .modal-content { width: 90%; padding: 15px 20px; }
-            .main-title { font-size: 20px; }
-            h3 { font-size: 16px; }
-            .story-intro { font-size: 13px; }
-            .plot-option { padding: 10px 15px; }
+        /* 结局倒计时提示 */
+        .countdown-tip {
+            color: #e74c3c;
+            text-align: center;
+            font-weight: 600;
+            margin: 20px 0;
+            display: none;
+            font-size: 16px;
+            padding: 12px;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 8px;
+        }
+        h3 {
+            color: #34495e;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            font-weight: 600;
+        }
+        /* 秘术选择按钮 - 专属样式 */
+        .skill-btn {
+            background: #f5f0ff;
+            border: 2px solid #9b59b6;
+            font-weight: 600;
+            color: #9b59b6;
+        }
+        .skill-btn:hover {
+            background: #9b59b6;
+            color: white;
+            border-color: #9b59b6;
+        }
+        /* 适配小屏手机 */
+        @media (max-width: 375px) {
+            .container {
+                padding: 15px 10px;
+            }
+            .option {
+                padding: 15px 18px;
+                font-size: 15px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            h3 {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 新增页面主标题 -->
-    <h1 class="main-title">青岚宗秘境 - 修仙道途抉择</h1>
-
-    <div id="story-container">
-        <!-- 根功法选择 -->
-        <div class="select-step" id="root-step">
-            <h3>选择根功法</h3>
-            <!-- 根功法剧情介绍区域 -->
-            <div class="story-intro" id="root-intro">
-                <h4>剧情背景</h4>
-                <p>你本是青岚宗外门弟子，因偶得上古秘境传承，需从四大至高根功法中择一修行，此选择将决定你一生的修仙轨迹，仙魔两道，一念之间...</p>
-            </div>
-            <div class="option" data-key="星河令">星河令</div>
-            <div class="option" data-key="长生诀">长生诀</div>
-            <div class="option" data-key="天魔策">天魔策</div>
-            <div class="option" data-key="大荒神陨录">大荒神陨录</div>
-        </div>
-
-        <!-- level2流派选择（初始隐藏） -->
-        <div class="select-step" id="level2-step" style="display: none;"></div>
-
-        <!-- level3功法选择（初始隐藏） -->
-        <div class="select-step" id="level3-step" style="display: none;"></div>
-
-        <!-- level4境界显示（初始隐藏） -->
-        <div class="select-step" id="level4-step" style="display: none;"></div>
-
-        <!-- 结局前剧情选择步骤 -->
-        <div class="plot-choice-step" id="plot-choice-step">
-            <h3>关键剧情抉择（此选择将决定最终结局）</h3>
-            <div class="story-intro" id="plot-intro"></div>
-            <div id="plot-options"></div>
-            <div class="jump-tip" id="jump-tip" style="display: none;">你已做出选择，即将跳转至最终结局...（<span id="countdown">3</span>秒后自动跳转）</div>
-        </div>
-
-        <!-- level5结局选择（初始隐藏） -->
-        <div class="select-step" id="level5-step" style="display: none;"></div>
+    <!-- 网易云音乐外链 - 西瓜JUN《至尊》（自动循环+本地兼容） -->
+    <div class="music-player">
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="100%" 
+        src="https://music.163.com/outchain/player?type=2&id=1861403382&auto=1&height=32"
+        sandbox="allow-scripts allow-same-origin allow-popups" 
+        allow="autoplay; music-playback">
+        </iframe>
     </div>
 
-    <!-- 结局详情弹窗 -->
-    <div class="modal" id="detailModal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h4 id="modalTitle"></h4>
-            <div class="modal-detail" id="modalDetail"></div>
+    <!-- 手机安全区 -->
+    <div class="status-bar"></div>
+    <!-- 主内容容器 -->
+    <div class="container">
+        <h2>青岚宗秘境 · 三生道途抉择</h2>
+
+        <!-- 步骤1：择无上根法（初始页面） -->
+        <div class="step active" id="step1">
+            <h3>第一步：叩问本心，择无上根法</h3>
+            <div class="plot-text">
+                你是青岚宗外门弟子，因误入后山「锁灵渊」，失足坠入万丈崖底，竟撞开尘封三千年的上古秘境。
+                秘境穹顶悬着三道流光，化作三本古朴古籍：<br>
+                一本嵌满碎星，星力呼啸欲裂；一本萦绕淡金霞光，寿元气息沁人心脾；一本裹着浓浓血雾，魔威直冲神魂。
+                崖底传来苍老低语：「三法择一，道途既定，仙魔殊途，再无回头。」
+            </div>
+            <div class="option" data-root="星河令" data-bg="bg-xinghe">星河令 - 御星算天，引星辰之力铸不灭道基</div>
+            <div class="option" data-root="长生诀" data-bg="bg-changsheng">长生诀 - 炼体延寿，聚天地灵气筑不朽肉身</div>
+            <div class="option" data-root="天魔策" data-bg="bg-tianmo">天魔策 - 噬血噬魂，吞万灵精魄成魔道至尊</div>
+        </div>
+
+        <!-- 步骤2：择分支精修 -->
+        <div class="step" id="step2">
+            <h3>第二步：法随心动，择分支精修</h3>
+            <div class="plot-text" id="plot2"></div>
+            <div id="flow-options"></div>
+            <button class="back-btn" onclick="showStep('step1')">返回重择根法</button>
+        </div>
+
+        <!-- 步骤3：择核心秘术（双选项） -->
+        <div class="step" id="step3">
+            <h3>第三步：凝心悟道，择核心秘术</h3>
+            <div class="plot-text" id="plot3">选定流派后，丹田内浮现两道秘术灵光，皆为该流派无上绝学，择其一精修，道途截然不同！</div>
+            <div id="skill-option"></div>
+            <button class="back-btn" onclick="showStep('step2')">返回重择流派</button>
+        </div>
+
+        <!-- 步骤4：生死关头抉择 -->
+        <div class="step" id="step4">
+            <h3>第四步：生死关头，决命运走向</h3>
+            <div class="plot-text" id="plot4"></div>
+            <div id="choice-options"></div>
+            <div class="countdown-tip" id="countdown">抉择已定，3秒后揭晓最终道途...</div>
+            <button class="back-btn" onclick="showStep('step3')">返回重选秘术</button>
+        </div>
+
+        <!-- 步骤5：最终结局 -->
+        <div class="step" id="step5">
+            <h3>终局：道途既定，看万古荣光</h3>
+            <div class="plot-text" id="plot5"></div>
+            <button class="reset-btn" onclick="resetAll()">重踏仙途，再择机缘</button>
         </div>
     </div>
 
     <script>
-        // 完整剧情数据：修复ID重复+补全缺失属性+统一数据结构
-        const storyData = {
-            星河令: {
-                intro: "星河令乃上古星神嫡传功法，以诸天星辰为根基，可御星、算星、融星魂，修炼者与星辰共生，寿元绵长，星力越强修为越高，然此功法需感悟星辰本源，悟性不足者终其一生难入门径...",
-                level2: [
-                    {id: 31, name: "御星流", desc: "御使星辰，引星之力", detail: "御星流为星河令核心一脉，可御使诸天星辰，引星辰之力为自身所用", intro: "御星流以“御使”为核心，需以神魂牵引星辰轨迹，修至入门可凝星刃，大成可召星砸落，然星辰之力狂暴，神魂薄弱者易被星力反噬，沦为星奴..."},
-                    {id: 32, name: "星算流", desc: "星象推演，预知祸福", detail: "星算流为星河令最神秘的一脉，通过观测星象推演天道运势", intro: "星算流以“推演”为核心，需心无杂念、悟性通天，修至入门可预知祸福，大成可逆天改命，然推演天道过多易遭天谴，轻则眼盲，重则魂飞魄散..."},
-                    {id: 33, name: "星魂流", desc: "融星魂于自身，与星同存", detail: "星魂流为星河令最持久的一脉，将星辰之魂融入自身神魂", intro: "星魂流以“融合”为核心，需遍历诸天星辰，融星魂入自身，修至入门可增寿元，大成可与星辰共生，然融合星魂过多易导致自身意识被星魂吞噬，沦为星辰傀儡..."}
-                ],
-                level3: {
-                    御星流: [
-                        {id: 311, name: "星辰御天诀", desc: "御天星辰，执掌星权", detail: "星辰御天诀为御星流第一秘术，可御使诸天星辰，执掌星辰权柄", intro: "星辰御天诀乃御星流至尊功法，修至大成可执掌星辰权柄，调节星象轨迹，召亿万星辰砸落，然执掌星权需受星神考验，心术不正者将被星辰之力碾灭神魂...",
-                        correspondingLevel4: "星辰皇",
-                        plotChoice: {
-                            intro: "你修成星辰御天诀，执掌诸天星权，星神残魂现身考验：要么奉星神为主，永世为星辰之仆，掌完整星权；要么拒绝臣服，以自身之力对抗星神，保留自由之身...",
-                            options: [
-                                { id: 'plot1', name: "奉星神为主，执掌完整星辰权柄", targetEnd: 3111 },
-                                { id: 'plot2', name: "拒绝臣服，以自身之力对抗星神残魂", targetEnd: 3112 }
-                            ]
+        // 核心剧情数据 - 三大根法+双流派+双秘术+多结局
+        const immortalData = {
+            星河令: [
+                {
+                    flow:"御星流", 
+                    plot2:"你指尖触碰到《星河令》，刹那间漫天星屑涌入丹田，识海浮现亿万星辰图谱。古籍化作一道星虹，在你经脉中流转，所过之处窍穴尽通。守陵长老虚影浮现：「御星者，可引星力攻伐，亦可借星轨推演，你选哪条路？」",
+                    skills: [
+                        {
+                            name:"星辰御天诀", 
+                            realm:"星辰皇", 
+                            plot4:"你引星力灌体，境界突破至星辰皇，周身七星环缭绕，威压震慑秘境。忽然，秘境穹顶裂开星门，上古星神残魂走出：「吾乃星界之主，奉吾为主，赐你星军兵权；若抗，神魂化星屑，永世不得超生！」",
+                            choices:["俯首叩拜，奉星神为主，愿掌星界兵权", "拔剑怒喝，反抗星神威压，誓守自身道心"],
+                            ends:["你成星神座下第一战神，掌百万星军，威慑诸天万界，你的名号成了星空生灵的禁忌", "你以道心硬撼星神残魂，九死一生悟得「星主自身」，从此执掌命运，逍遥于星空之外"]
                         },
-                        level5: [
-                            {id: 3111, name: "召唤星辰砸落", desc: "引诸天星辰之力，砸落仙界魔界", detail: "你修星辰御天诀大成后，可引诸天星辰之力，召唤星辰砸落，无论是仙界城池还是魔界领地，皆能一击摧毁，威慑诸天，被尊为星辰皇，掌星辰召唤之力，万仙万魔都要俯首。", correspondingLevel4: "星辰皇"},
-                            {id: 3112, name: "执掌星权", desc: "执掌诸天星辰权柄，调节星象", detail: "你修星辰御天诀至巅峰，执掌诸天星辰权柄，可随意调节星象，修改星辰轨迹，维护天地星象秩序，最终成为星辰帝，掌世间星辰法则，统御诸天星辰。", correspondingLevel4: "星辰帝"},
-                            {id: 3113, name: "御星游历", desc: "御使星辰，游历诸天万界", detail: "你修星辰御天诀大成后，不恋权柄，御使星辰，游历诸天万界，赏星辰美景，遇强则战，遇弱则护，最终成为御星仙尊，掌御星之道，逍遥天地之间。", correspondingLevel4: "御星仙尊"}
-                        ]},
-                        {id: 312, name: "星刃诛魔诀", desc: "凝聚星刃，诛仙杀魔", detail: "星刃诛魔诀为御星流最具杀伤力的功法，引星辰之力凝聚星刃，一刀可斩断星辰", intro: "星刃诛魔诀专炼星辰杀力，以纯碎星力凝聚无坚不摧的星刃，修至入门可斩金丹，大成可斩帝境，然此功法过于刚猛，经脉脆弱者易被星刃之力撕裂经脉，爆体而亡...",
-                        correspondingLevel4: "星刃皇",
-                        plotChoice: {
-                            intro: "你修成星刃诛魔诀，星刃可斩帝境，仙界传你欲弑帝夺位，仙帝下令围剿你：要么提刃杀入仙界，斩杀仙帝证道；要么隐于星河，以星刃守护星辰之道，不涉红尘...",
-                            options: [
-                                { id: 'plot1', name: "提刃杀入仙界，一刀斩杀仙帝证道", targetEnd: 3121 },
-                                { id: 'plot2', name: "隐于星河，以星刃守护星辰秩序，抵御外敌", targetEnd: 3122 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3121, name: "星刃风暴诛仙帝", desc: "凝聚亿万星刃，形成风暴斩杀仙帝", detail: "你修星刃诛魔诀大成后，凝聚亿万星刃，形成星刃风暴，孤身一人前往仙界，斩杀仙界仙帝，一战成名，被尊为星刃皇，掌星刃之力，无人可挡。", correspondingLevel4: "星刃皇"},
-                            {id: 3122, name: "星刃护道", desc: "以星刃之力，守护星辰之道", detail: "你修星刃诛魔诀至巅峰，以星刃之力，守护星辰之道，抵御那些妄图破坏星辰秩序的仙魔强者，最终成为星刃帝，掌星刃法则，威慑诸天，守护星辰安宁。", correspondingLevel4: "星刃帝"},
-                            {id: 3123, name: "传承星刃术", desc: "广收弟子，传承星刃诛魔诀", detail: "你修星刃诛魔诀大成后，广收弟子，挑选有天赋之辈，传承星刃诛魔诀，培育出无数御星强者，最终成为星刃宗师，掌星刃修炼之道，统御天下星刃修士。", correspondingLevel4: "星刃宗师"}
-                        ]},
-                        {id: 313, name: "星河护体诀", desc: "引星河之力，护体防身", detail: "星河护体诀为御星流最具防御性的功法，引星河之力形成护体星河，万物不侵", intro: "星河护体诀专炼星辰防御之力，以星河为盾，修至入门可挡元婴攻击，大成可硬抗帝境一击，然此功法需耗费大量星力滋养护体星河，修炼速度极慢，易被同辈超越...",
-                        correspondingLevel4: "星河皇",
-                        plotChoice: {
-                            intro: "你修成星河护体诀，护体星河可硬抗帝境一击，仙魔大战爆发，苍生流离失所：要么化身为星河战甲，守护一方苍生；要么隐于星河深处，独善其身，潜心修炼...",
-                            options: [
-                                { id: 'plot1', name: "化星河战甲，守护凡间苍生抵御仙魔纷争", targetEnd: 3131 },
-                                { id: 'plot2', name: "隐于星河深处，潜心修炼护体之道，不问世事", targetEnd: 3133 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3131, name: "星河战甲护苍生", desc: "化星河战甲，守护一方苍生", detail: "你修星河护体诀大成后，化身为星河战甲，守护一方苍生，抵御仙魔纷争带来的灾祸，功德无量，被尊为星河皇，掌星河护体之力，守护苍生安宁。", correspondingLevel4: "星河皇"},
-                            {id: 3132, name: "星河战甲战魔主", desc: "携星河战甲，正面硬抗魔主", detail: "你修星河护体诀至巅峰，星河战甲防御无双，正面硬抗魔界魔主攻击，不落下风，守护仙界安宁，最终成为星河帝，掌星河法则，统御天下星河之力。", correspondingLevel4: "星河帝"},
-                            {id: 3133, name: "隐于星河", desc: "隐于星河之中，潜心修炼护体之道", detail: "你修星河护体诀后，不恋红尘纷争，隐于诸天星河之中，潜心修炼护体之道，最终修至仙尊之境，成为星河仙翁，与星河共存，永世不灭。", correspondingLevel4: "星河仙翁"}
-                        ]}
-                    ],
-                    星算流: [
-                        {id: 321, name: "星象推演诀", desc: "推演星象，预知祸福", detail: "星象推演诀为星算流本源功法，通过观测星象推演天道运势，预知祸福吉凶", intro: "星象推演诀乃星算流基础功法，修至入门可预知自身祸福，大成可推演天地未来，然推演越深远，损耗的神魂与寿元越多，许多星算修士最终皆油尽灯枯...",
-                        correspondingLevel4: "星算皇",
-                        plotChoice: {
-                            intro: "你修成星象推演诀，可推演天地未来，发现三千年后诸天浩劫将至：要么耗费自身寿元，推演避劫之法，守护天地苍生；要么隐于星台，独善其身，不问浩劫...",
-                            options: [
-                                { id: 'plot1', name: "耗费寿元推演避劫之法，守护天地苍生", targetEnd: 3211 },
-                                { id: 'plot2', name: "隐于诸天星台，潜心推演星象，不问浩劫祸福", targetEnd: 3213 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3211, name: "推演天地未来", desc: "推演天地未来走势，规避浩劫", detail: "你修星象推演诀大成后，可推演天地未来走势，预知诸天浩劫，提前布局，规避浩劫，守护天地安宁，功德无量，被尊为星算皇，掌星象推演之力，受万仙敬仰。", correspondingLevel4: "星算皇"},
-                            {id: 3212, name: "预知仙帝陨落", desc: "推演仙帝陨落之日，辅佐新帝", detail: "你修星象推演诀至巅峰，可预知仙界仙帝的陨落之日，提前辅佐有仙缘之人，助其登基为帝，维护仙界秩序，最终成为星算帝，掌星算法则，统御天下星算修士。", correspondingLevel4: "星算帝"},
-                            {id: 3213, name: "隐于星台", desc: "隐于星台，推演星象，不问世事", detail: "你修星象推演诀大成后，不恋权柄，隐于诸天星台之上，潜心推演星象，不问红尘纷争，虽不涉世事，却能提前预知浩劫，暗中守护天地，最终成为星算仙翁，永世推演星象。", correspondingLevel4: "星算仙翁"}
-                        ]},
-                        {id: 322, name: "逆天改命诀", desc: "修改星象，逆天改命", detail: "逆天改命诀为星算流最逆天的功法，可通过修改星象轨迹，逆天改命", intro: "逆天改命诀乃星算流禁忌功法，修至入门可修改凡人运势，大成可让将死之人起死回生，然每一次改命都需以自身道心为代价，道心不坚者易坠入魔道，永无翻身之日...",
-                        correspondingLevel4: "改命皇",
-                        plotChoice: {
-                            intro: "你修成逆天改命诀，恰逢诸天浩劫将至，苍生运势皆尽：要么损耗自身道心，为苍生集体改命，规避浩劫；要么只为自身改命，突破帝境桎梏，独善其身...",
-                            options: [
-                                { id: 'plot1', name: "损耗道心，修改天地星象为苍生逆天改命", targetEnd: 3221 },
-                                { id: 'plot2', name: "修改自身星象，突破境界桎梏，不问苍生死活", targetEnd: 3222 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3221, name: "为苍生改命", desc: "修改天地星象，为苍生逆天改命", detail: "你修逆天改命诀大成后，恰逢诸天浩劫将至，苍生流离失所，你不惜损耗自身修为，修改天地星象，为苍生逆天改命，规避浩劫，功德昭昭，被尊为改命皇，掌逆天改命之力，受万仙万魔敬仰。", correspondingLevel4: "改命皇"},
-                            {id: 3222, name: "为自身改命", desc: "修改自身星象，突破境界桎梏", detail: "你修逆天改命诀后，自身遭遇境界桎梏，无法突破，你果断修改自身星象，逆天改命，突破桎梏，最终修至帝境，成为改命帝，掌改命法则，可随意修改他人运势。", correspondingLevel4: "改命帝"},
-                            {id: 3223, name: "隐于暗处改命", desc: "隐于暗处，暗中修改有缘人运势", detail: "你修逆天改命诀后，不喜张扬，隐于诸天暗处，暗中修改那些心怀善意、有仙缘之人的运势，助其摆脱困境，成就仙途，最终成为隐世改命尊，掌暗处改命之道，无人知晓你的存在。", correspondingLevel4: "隐世改命尊"}
-                        ]},
-                        {id: 323, name: "星算御敌诀", desc: "推演敌人轨迹，御敌于千里之外", detail: "星算御敌诀为星算流最具实用性的功法，通过推演敌人轨迹提前布局", intro: "星算御敌诀乃星算流实战功法，修至入门可推演金丹修士轨迹，大成可推演帝境强者弱点，然此功法需时刻保持心无杂念，战斗中稍有分神，推演便会出错，自身反遭其害...",
-                        correspondingLevel4: "星算战皇",
-                        plotChoice: {
-                            intro: "你修成星算御敌诀，可推演帝境强者弱点，魔界魔主率大军入侵仙界：要么推演魔主轨迹，一击致命斩杀魔主；要么推演仙魔大战战局，助仙界布局掌控战局...",
-                            options: [
-                                { id: 'plot1', name: "推演魔主行动轨迹，寻其弱点一击致命", targetEnd: 3231 },
-                                { id: 'plot2', name: "推演仙魔大战整体轨迹，助仙界布局掌控战局", targetEnd: 3232 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3231, name: "推演魔主轨迹，一击致命", desc: "推演魔界魔主行动轨迹，一击致命", detail: "你修星算御敌诀大成后，推演魔界魔主的行动轨迹，找到其弱点，一击致命，斩杀魔主，守护仙界安宁，被尊为星算战皇，掌星算御敌之力，无人可挡。", correspondingLevel4: "星算战皇"},
-                            {id: 3232, name: "推演仙魔大战轨迹，掌控战局", desc: "推演仙魔大战整体走势，助仙界掌控战局", detail: "你修星算御敌诀至巅峰，推演仙魔大战的轨迹，提前布局，掌控战局，助仙界击败魔族，维护天地秩序，最终成为星算战帝，掌星算御敌法则，统御天下星算实战修士。", correspondingLevel4: "星算战帝"},
-                            {id: 3233, name: "游历诸天，推演御敌", desc: "游历诸天万界，推演敌人轨迹，护佑有缘人", detail: "你修星算御敌诀大成后，游历诸天万界，遇到有缘人便推演其敌人轨迹，助其御敌，护佑其平安，最终成为星算仙尊，掌星算御敌之道，逍遥天地之间。", correspondingLevel4: "星算仙尊"}
-                        ]}
-                    ],
-                    星魂流: [
-                        {id: 331, name: "星辰融魂诀", desc: "融星辰之魂，炼就星魂", detail: "星辰融魂诀为星魂流第一秘术，将星辰之魂融入自身神魂炼就不灭星魂", intro: "星辰融魂诀乃星魂流核心功法，修至入门可融普通星辰之魂，大成可融星辰之王星魂，然融合星魂时需承受星魂的意识冲击，意志不坚者将被星魂占据身体，沦为星辰傀儡...",
-                        correspondingLevel4: "星魂皇",
-                        plotChoice: {
-                            intro: "你修成星辰融魂诀，可融亿万星魂，诸天星辰之王星魂现身：要么融合亿万星辰之魂，炼就真正的不灭星魂；要么与星辰之王共生，借其力与星辰同存...",
-                            options: [
-                                { id: 'plot1', name: "遍历诸天，融合亿万星辰之魂炼就不灭星魂", targetEnd: 3311 },
-                                { id: 'plot2', name: "与星辰之王共生，借其之力与诸天星辰同存", targetEnd: 3312 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3311, name: "融亿万星魂，炼就不灭星魂", desc: "融合亿万星辰之魂，炼就真正的不灭星魂", detail: "你修星辰融魂诀大成后，耗时万年，融合亿万星辰之魂，炼就真正的不灭星魂，无惧任何神魂攻击，可脱离肉身独立存在，被尊为星魂皇，掌星魂之力，统御诸天星魂。", correspondingLevel4: "星魂皇"},
-                            {id: 3312, name: "与星辰共生，永世不灭", desc: "与诸天星辰共生，寿元无尽，永世不灭", detail: "你修星辰融魂诀至巅峰，与诸天星辰共生，星辰不灭，你便不灭，寿元无尽，最终修至帝境，成为星魂帝，掌星魂法则，统御天下星魂修士。", correspondingLevel4: "星魂帝"},
-                            {id: 3313, name: "守护星辰之魂", desc: "以不灭星魂，守护诸天星辰之魂", detail: "你修星辰融魂诀大成后，主动守护诸天星辰之魂，抵御那些妄图吞噬星辰之魂的仙魔强者，成为星辰之魂的守护神，最终成为星魂尊，掌星辰之魂守护之道，与星辰共存。", correspondingLevel4: "星魂尊"}
-                        ]},
-                        {id: 332, name: "星魂分身诀", desc: "以星魂之力，凝聚分身", detail: "星魂分身诀为星魂流最具灵活性的功法，以星魂之力凝聚无数分身", intro: "星魂分身诀乃星魂流百变功法，修至入门可凝十具分身，大成可凝亿万分身，然分身越多，自身星魂损耗越大，分身若被尽数斩杀，自身神魂也会遭受重创，修为大跌...",
-                        correspondingLevel4: "星魂分身皇",
-                        plotChoice: {
-                            intro: "你修成星魂分身诀，可凝亿万星魂分身，诸天万界皆可布成分身：要么将分身遍布诸天，探查所有情报掌控诸天动态；要么以亿万分身征战诸天，击败所有敌人...",
-                            options: [
-                                { id: 'plot1', name: "凝亿万星魂分身，遍布诸天探查所有情报", targetEnd: 3321 },
-                                { id: 'plot2', name: "率亿万星魂分身，征战诸天万界击败所有敌人", targetEnd: 3322 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3321, name: "亿万星魂分身，遍布诸天", desc: "凝聚亿万星魂分身，遍布诸天万界，探查情报", detail: "你修星魂分身诀大成后，凝聚亿万星魂分身，遍布诸天万界，探查所有情报，掌控诸天动态，被尊为星魂分身皇，掌星魂分身之力，无人能逃脱你的探查。", correspondingLevel4: "星魂分身皇"},
-                            {id: 3322, name: "星魂分身战诸天", desc: "以星魂分身，征战诸天万界", detail: "你修星魂分身诀至巅峰，以亿万星魂分身，征战诸天万界，击败所有敌人，统御诸天，最终成为星魂分身帝，掌星魂分身法则，威慑诸天万界。", correspondingLevel4: "星魂分身帝"},
-                            {id: 3323, name: "星魂分身修炼", desc: "以星魂分身，同时修炼，快速提升", detail: "你修星魂分身诀后，以亿万星魂分身同时修炼，快速提升自身修为，无需耗费过多时间，最终修至仙尊之境，成为星魂分身仙翁，掌星魂分身修炼之道，逍遥天地。", correspondingLevel4: "星魂分身仙翁"}
-                        ]},
-                        {id: 333, name: "星魂疗伤诀", desc: "以星魂之力，疗伤续命", detail: "星魂疗伤诀为星魂流最具功德的功法，以星魂之力修复神魂肉身损伤", intro: "星魂疗伤诀乃星魂流辅助功法，修至入门可修复金丹修士神魂损伤，大成可活死人肉白骨，然疗伤时需将自身星魂注入伤者体内，星魂损耗过多，自身修为会暂时大跌，易遭人暗算...",
-                        correspondingLevel4: "星魂疗伤皇",
-                        plotChoice: {
-                            intro: "你修成星魂疗伤诀，可修复帝境强者神魂损伤，仙魔大战后万仙皆伤：要么以星魂之力救治万仙，修复其神魂损伤；要么在仙界开设医馆，专治神魂受损之人...",
-                            options: [
-                                { id: 'plot1', name: "耗尽星魂之力，救治仙魔大战中的受伤万仙", targetEnd: 3331 },
-                                { id: 'plot2', name: "在仙界开设星魂医馆，救治所有神魂受损有缘人", targetEnd: 3333 }
-                            ]
-                        },
-                        level5: [
-                            {id: 3331, name: "星魂疗伤救万仙", desc: "以星魂之力，救治万仙，修复神魂损伤", detail: "你修星魂疗伤诀大成后，在仙魔大战中，以星魂之力救治无数受伤的仙人，修复其神魂损伤，功德无量，被尊为星魂疗伤皇，掌星魂疗伤之力，受万仙敬仰。", correspondingLevel4: "星魂疗伤皇"},
-                            {id: 3332, name: "星魂续命救苍生", desc: "以星魂之力，为苍生续命，摆脱劫难", detail: "你修星魂疗伤诀至巅峰，以星魂之力，为那些遭遇劫难、寿元将尽的苍生续命，摆脱劫难，泽被苍生，最终成为星魂续命帝，掌星魂续命法则，统御天下星魂疗伤修士。", correspondingLevel4: "星魂续命帝"},
-                            {id: 3333, name: "开设星魂医馆", desc: "在仙界开设星魂医馆，救治神魂受损之人", detail: "你修星魂疗伤诀大成后，在仙界开设星魂医馆，不问身份，救治所有神魂受损之人，无论是仙是魔，只要心怀善意，皆可得到你的救治，最终成为星魂医尊，掌星魂医道法则。", correspondingLevel4: "星魂医尊"}
-                        ]}
+                        {
+                            name:"星陨七杀诀", 
+                            realm:"星陨帝", 
+                            plot4:"你以陨星力炼体，境界突破至星陨帝，手中陨星杀剑引动漫天陨石，天地色变。星界执法者踏星而来，手持星罚之链：「你杀伐过重，违逆星界规则，要么自废修为受罚，要么以力抗罚，血战星界！」",
+                            choices:["自废三成修为，接受星罚，暂避杀劫", "执陨星杀剑，血战星界执法者，誓不低头"],
+                            ends:["你自废三成修为，星罚消散，从此收敛杀伐，以星力守护一方，成了星空守护者", "你血战星界执法者，斩落数人，却引动星核自爆，肉身陨灭，仅剩一缕残魂遁入星云，永世漂泊"]
+                        }
                     ]
-                }
-            },
-            长生诀: {
-                intro: "长生诀乃上古长生仙尊所创，核心为‘寿元’与‘肉身’，修炼者可延年益寿，肉身不朽，然此功法易让人沉迷寿元积累，忘却修仙本心，最终沦为寿元的奴隶...",
-                level2: [
-                    { id: 204, name: "固本流", desc: "锤炼肉身根基，寿元绵长", detail: "固本流注重肉身锤炼，从外而内打磨躯体，修成后肉身堪比灵宝", intro: "固本流注重肉身锤炼，从外而内打磨躯体，每一次锤炼都需耗费大量天材地宝，然修成后肉身堪比灵宝，刀枪不入，水火不侵，是长生诀最稳妥的一脉...", },
-                    { id: 205, name: "延寿流", desc: "专修延寿之术，可增寿元千年", detail: "延寿流直接作用于寿元本源，每突破一层增寿千年", intro: "延寿流直接作用于寿元本源，修炼者每突破一层便可增寿千年，入门极易，然寿元过盛易遭天道嫉妒，引来专属的寿元天劫，天劫威力随寿元增加而暴涨...", },
-                    { id: 206, name: "渡劫流", desc: "以渡劫炼体，借天罚提升修为", detail: "渡劫流主动引天劫炼体，天劫越强修为提升越多", intro: "渡劫流反其道而行，主动引天劫炼体，天劫越强，肉身与修为提升越多，九死一生的修炼之路，十修九陨，然一旦成活，修为进展一日千里...", }
-                ],
-                level3: {
-                    "固本流": [
+                },
+                {
+                    flow:"星算流", 
+                    plot2:"《星河令》融入你眉心，识海化作一片星图，每一颗星辰都对应着一人一界的命运。你闭眼推演，竟能看到宗门弟子的生老病死。守陵长老虚影轻叹：「星算者，可窥天机，亦可改命，你敢踏这逆天之路吗？」",
+                    skills: [
                         {
-                            id: 305,
-                            name: "九转固元功",
-                            desc: "九转锤炼肉身，固若金汤",
-                            detail: "九转固元功需历经九次肉身涅槃，涅槃后肉身脱胎换骨",
-                            intro: "九转固元功需历经九次肉身涅槃，每一次涅槃都需承受撕心裂肺之痛，涅槃后肉身脱胎换骨，第八次涅槃后距不死金身仅一步之遥，是固本流的至尊功法...",
-                            correspondingLevel4: "固元境",
-                            plotChoice: {
-                                intro: "你完成第八次固元涅槃，距不死金身仅一步之遥，此时肉身已达极限，神魂却稍显薄弱：要么放缓进度，温养神魂后再炼第九次涅槃；要么强行冲击第九次涅槃，速成真身...",
-                                options: [
-                                    { id: 'plot1', name: "循序渐进，先养神魂再炼肉身", targetEnd: 509 },
-                                    { id: 'plot2', name: "急于求成，强行冲击第九次涅槃", targetEnd: 510 }
-                                ]
-                            },
-                            level5: [
-                                { id: 509, name: "不死金身", desc: "肉身成圣，不死不灭", detail: "你完成九转固元，肉身化为不死金身，刀枪不入，水火不侵，即便是天罚也无法伤你分毫，最终肉身成圣，与天地同寿，成为长生仙尊。", correspondingLevel4: "固元境" },
-                                { id: 510, name: "固元成痴", desc: "一味炼体，神魂跟不上肉身修为，沦为痴儿", detail: "你只知锤炼肉身，忽视了神魂的修炼，最终肉身达到圣境，神魂却停留在入门阶段，意识模糊，沦为只知炼体的痴儿，永世无法开启灵智。", correspondingLevel4: "固元境" }
-                            ]
-                        }
-                    ],
-                    "延寿流": [
+                            name:"逆天改命诀", 
+                            realm:"改命皇", 
+                            plot4:"你掐诀推演，一口鲜血喷在星盘上，三千年后邪魔降世的浩劫清晰浮现。眉心星印发烫，寿元飞速流逝，守陵长老低语：「要么耗寿元推破劫之法，要么封星盘隐世，任天地倾覆。」",
+                            choices:["燃尽千年寿元，推演破劫之法，救亿万苍生", "封印命运星盘，隐世不出，只求自身逍遥"],
+                            ends:["你以千年寿元换破劫之策，九州生灵存续，你化作观星台石像，受万世香火供奉", "你隐于星空深处，浩劫降临九州破碎，你成了天道不容的孤魂，永世漂泊"]
+                        },
                         {
-                            id: 306,
-                            name: "千寿延年经",
-                            desc: "每修一层增寿千年，可修九层",
-                            detail: "千寿延年经共九层，九层圆满可增寿九千年，易入门难圆满",
-                            intro: "千寿延年经共九层，每一层都需吸收天地间的寿元之气，九层圆满可增寿九千年，是长生诀最易入门却最难圆满的功法，第九层后天道便会降下寿元考验...",
-                            correspondingLevel4: "千寿境",
-                            plotChoice: {
-                                intro: "你修成第八层千寿延年经，寿元已达八千年，天道降下寿元考验：要么止步九层，稳固修为安享无尽寿元；要么逆天而行，冲击第十层突破天道寿元限制...",
-                                options: [
-                                    { id: 'plot1', name: "知足常乐，稳固九层修为安享寿元", targetEnd: 511 },
-                                    { id: 'plot2', name: "逆天而行，强行冲击第十层寿元境界", targetEnd: 512 }
-                                ]
-                            },
-                            level5: [
-                                { id: 511, name: "天地寿星", desc: "寿元无尽，成为天地间的长寿之神", detail: "你修完千寿延年经九层，寿元突破天道限制，成为天地寿星，世间万物皆向你求延寿之法，你居于寿元山，受万族敬仰，寿元与天地同辉。", correspondingLevel4: "千寿境" },
-                                { id: 512, name: "寿尽魂散", desc: "强行突破九层，寿元瞬间耗尽", detail: "你不满足九层寿元，强行冲击第十层，触怒寿元天道，自身寿元被瞬间抽干，即便有长生诀根基，也难逃魂飞魄散的结局，化为天地间一缕清气。", correspondingLevel4: "千寿境" }
-                            ]
-                        }
-                    ],
-                    "渡劫流": [
-                        {
-                            id: 307,
-                            name: "渡劫炼体诀",
-                            desc: "引天罚炼体，越渡劫修为越高",
-                            detail: "渡劫炼体诀主动引天劫，天劫威力逐次翻倍，九死一生",
-                            intro: "渡劫炼体诀需主动引动天劫，以天罚之火淬炼肉身，每渡一次天劫，肉身强度便提升一分，天劫威力会逐次翻倍，八千次天劫后便是天道九九重劫...",
-                            correspondingLevel4: "渡劫圣境",
-                            plotChoice: {
-                                intro: "你已渡过八千次天劫，肉身趋近于神，天道降下最强的九九重劫：要么直面重劫，求天道认可掌罚之位；要么避劫修身，沉淀修为再图突破...",
-                                options: [
-                                    { id: 'plot1', name: "直面九九重劫，求掌控天罚之力证道", targetEnd: 513 },
-                                    { id: 'plot2', name: "强行引动重劫，以肉身硬抗不避不让", targetEnd: 514 }
-                                ]
-                            },
-                            level5: [
-                                { id: 513, name: "罚神", desc: "掌控天罚之力，成为天道罚神", detail: "你历经万次天劫，肉身与神魂皆适应天罚之力，最终天道认可你的实力，封你为罚神，掌世间一切天罚，惩恶扬善，天罚之力为你所用。", correspondingLevel4: "渡劫圣境" },
-                                { id: 514, name: "天劫焚身", desc: "引动九九重劫，被天劫彻底焚毁", detail: "你自负渡劫无敌，引动天道最强的九九重劫，却不知此劫无人生还，最终被天劫之火彻底焚毁，连一丝神魂都未留下，化为天地间的灰烬。", correspondingLevel4: "渡劫圣境" }
-                            ]
+                            name:"星轨推演术", 
+                            realm:"星算帝", 
+                            plot4:"你以星轨推演自身道途，竟看到自己三日后将遭雷劫劈身，魂飞魄散。唯一的生路：要么借星盘遮蔽天机，隐于世俗避劫；要么引雷劫入体，以星力炼魂，逆天改命。",
+                            choices:["遮蔽天机，隐于世俗市井，暂避雷劫", "引雷劫入体，以星力炼魂，赌一场逆天机缘"],
+                            ends:["你遮蔽天机隐于世俗，雷劫落空，你在人间活了千年，看尽沧海桑田，寿终正寝", "你引雷劫炼魂，魂体大成，突破星算帝极限，成了天道推演不透的存在，逍遥于三界之外"]
                         }
                     ]
                 }
-            },
-            天魔策: {
-                intro: "天魔策乃魔道至高功法，由魔祖所创，核心为‘魔魂’‘炼魔’‘噬魂’，修炼者可快速提升修为，力量强横，然力量越强心魔越盛，稍有不慎便会堕入魔道深渊，永世不得超生...",
-                level2: [
-                    { id: 207, name: "血魔流", desc: "以血炼魔，战力暴涨，代价巨大", detail: "血魔流以生灵精血为引，快速提升修为，易滋生心魔", intro: "血魔流以生灵精血为引，快速提升修为，战力一日千里，然精血中的怨念会滋生心魔，修炼越久心魔越难压制，最终极易沦为只知嗜血的狂魔...", },
-                    { id: 221, name: "噬魂流", desc: "吞噬神魂，炼就魔魂", detail: "噬魂流以生灵神魂为引，炼就不灭魔魂，可夺舍肉身", intro: "噬魂流以生灵神魂为引，炼就不灭魔魂，魔魂越强修为越高，修至大成可夺舍他人肉身，是天魔策中最诡异、最能保命的一脉...", },
-                    { id: 231, name: "炼魔流", desc: "炼化魔物，以魔养魔", detail: "炼魔流炼化万千魔物，提取魔元滋养自身，底蕴深厚", intro: "炼魔流需炼化万千魔物，提取魔元滋养自身，魔物越强魔元越纯，底蕴深厚，然炼化先天魔祖极易遭其残魂反噬，万劫不复...", }
-                ],
-                level3: {
-                    "血魔流": [
+            ],
+            长生诀: [
+                {
+                    flow:"固本流", 
+                    plot2:"《长生诀》化作一道金光，钻入你的四肢百骸，你能清晰感受到，每一寸肌肉都在变强，每一滴血液都在焕发活力。守陵长老虚影抚须笑道：「固本者，炼体为先，九转涅槃后，肉身可堪比仙器，你可愿受这涅槃之苦？」",
+                    skills: [
                         {
-                            id: 308,
-                            name: "血魔噬心大法",
-                            desc: "吞噬他人精血，快速提升修为",
-                            detail: "血魔噬心大法可一念吸尽百万生灵精血，遭天地共愤",
-                            intro: "血魔噬心大法可吞噬生灵精血直接提升修为，大成时可一念吸尽百万生灵精血，战力暴涨，然此法遭天地共愤，易引来正道联合围剿，天地皆欲诛之...",
-                            correspondingLevel4: "血魔大境",
-                            plotChoice: {
-                                intro: "你已吞噬千万生灵精血，血魔大境大成，体内怨念滋生魔灵：要么以自身精血净化怨念，化魔为圣；要么继续吞噬亿万精血，凝聚血魔神格成始祖...",
-                                options: [
-                                    { id: 'plot1', name: "吞噬亿万精血，凝聚血魔神格成始祖", targetEnd: 515 },
-                                    { id: 'plot2', name: "无差别吞噬，不顾精血怨念滋生魔灵", targetEnd: 516 }
-                                ]
-                            },
-                            level5: [
-                                { id: 515, name: "血魔始祖", desc: "吞噬亿万精血，成为血魔始祖", detail: "你吞噬了亿万生灵的精血，凝聚血魔神格，成为血魔一族的始祖，统御世间所有血魔，你的一声令下，亿万血魔皆为你所用，威慑诸天。", correspondingLevel4: "血魔大境" },
-                                { id: 516, name: "精血反噬", desc: "吞噬精血过杂，被精血中的怨念反噬", detail: "你不顾精血纯度，肆意吞噬万千生灵的精血，其中的怨念凝聚成魔灵，在你体内作乱，最终你的肉身被魔灵撕裂，精血散尽而亡，沦为血魔的养料。", correspondingLevel4: "血魔大境" }
-                            ]
+                            name:"九转固元功", 
+                            realm:"固元圣境", 
+                            plot4:"你踏入丹火池准备第九转涅槃，丹火灼烧肉身时，神魂如风中残烛。守陵长老声音响起：「要么压制丹火温养神魂百年，要么强行冲关，赌不死金身机缘。」",
+                            choices:["压制丹火，温养神魂百年，待稳固后再涅槃", "引动全部丹火，强行冲关，誓修不死金身"],
+                            ends:["你温养神魂百年，涅槃圆满，修成不死金身，成世间唯一肉身圣人，受万族朝拜", "你强行冲关，神魂被丹火焚毁，虽有金刚之躯，却沦为炼体痴儿，终日奔走于山林"]
+                        },
+                        {
+                            name:"金刚不坏身", 
+                            realm:"金刚帝", 
+                            plot4:"你炼就金刚不坏身，肉身硬抗三次天劫而无伤，却发现自己的七情六欲正在逐渐消散，即将成为无心的长生傀儡。唯一选择：要么自废一成肉身，解封神魂；要么彻底封魂，成无心长生之躯。",
+                            choices:["自废一成肉身，解封神魂，保留七情六欲", "彻底封魂，成无心之躯，享永恒长生"],
+                            ends:["你解封神魂，虽失一成肉身，却保留七情六欲，成金刚帝，逍遥天地间，寿元五千年", "你彻底封魂，成无心长生之躯，肉身不朽，活过万古，却成了冰冷的长生傀儡，无人问津"]
                         }
-                    ],
-                    "噬魂流": [
-                        {id: 222, name: "噬魂夺舍诀", desc: "吞噬神魂，夺舍肉身", detail: "噬魂夺舍诀为噬魂流核心功法，吞噬他人神魂后可随意夺舍肉身，是噬魂流中最能保命的功法。",
-                        intro: "噬魂夺舍诀乃噬魂流保命至尊功法，修至入门可吞噬凡人神魂，大成可夺舍帝境强者肉身，然夺舍仙帝、魔帝等强者肉身时，极易被其残留神魂反制，自身沦为他人傀儡...",
-                        correspondingLevel4: "双面魔帝",
-                        plotChoice: {
-                            intro: "你修成噬魂夺舍诀大成，可夺舍帝境肉身，恰逢仙界仙帝渡天劫重伤：要么暗中潜伏，趁其虚弱夺舍仙帝肉身；要么放弃夺舍，轮回重生积累力量再图大业...",
-                            options: [
-                                { id: 'plot1', name: "暗中潜伏，趁仙帝重伤夺舍其肉身", targetEnd: 2221 },
-                                { id: 'plot2', name: "肉身损毁后，轮回夺舍积累无尽力量", targetEnd: 2222 }
-                            ]
+                    ]
+                },
+                {
+                    flow:"延寿流", 
+                    plot2:"《长生诀》融入你的丹田，化作一枚寿元果，你的寿元瞬间暴涨至千年。你站在镜前，竟发现鬓角的白发悄然变黑。守陵长老虚影叹道：「延寿者，可享千年岁月，却也会引来天劫觊觎，你敢逆天增寿吗？」",
+                    skills: [
+                        {
+                            name:"千寿延年经", 
+                            realm:"千寿真君", 
+                            plot4:"你寿元累积至八千年，天际雷云汇聚，紫金雷龙俯冲而下。守陵长老低语：「要么散去千年寿元化解天劫，要么催动寿元硬抗，破天道桎梏。」",
+                            choices:["散去千年寿元，化解天劫，安享八百年逍遥", "催动八千年寿元，硬撼雷龙，誓破天道桎梏"],
+                            ends:["你散去千年寿元，天劫退去，成天地寿星，八百年游遍名山大川，寿终正寝时天地落泪", "你以寿元硬抗雷龙，肉身被撕碎，神魂遁入不老泉，触怒天威，魂飞魄散"]
                         },
-                        level5: [
-                            {id: 2221, name: "夺舍仙帝身", desc: "趁仙界仙帝重伤，夺舍其肉身", detail: "你修噬魂夺舍诀大成后，暗中潜伏，趁仙界仙帝渡天劫重伤之际，果断出手吞噬其神魂，夺舍其仙帝肉身，自此鱼目混珠，掌控仙界部分权柄，最终成为双面魔帝，游走于仙魔两界，无人能识。", correspondingLevel4: "双面魔帝"},
-                            {id: 2222, name: "轮回夺舍", desc: "肉身损毁后，轮回夺舍，积累力量", detail: "你修噬魂夺舍诀后，在一次仙魔大战中肉身损毁，凭借夺舍之术轮回重生，多次夺舍天赋异禀之辈，积累无尽力量，最终突破桎梏，成为轮回魔帝，掌世间轮回夺舍之道，万劫不灭。", correspondingLevel4: "轮回魔帝"},
-                            {id: 2223, name: "噬魂保命", desc: "不主动惹事，以噬魂之力保命修炼", detail: "你修噬魂夺舍诀后，心性谨慎，不主动招惹仙魔强者，仅在遭遇危险时吞噬神魂保命、默默修炼，最终成为保命魔尊，虽无滔天权势，却能在诸天纷争中安然无恙，万劫不死。", correspondingLevel4: "保命魔尊"}
-                        ]},
-                        {id: 223, name: "神魂炼魔诀", desc: "炼化神魂，炼就魔魂", detail: "神魂炼魔诀为噬魂流本源功法，将吞噬的神魂炼化融入自身魔魂，炼就不灭魔魂。",
-                        intro: "神魂炼魔诀乃噬魂流本源功法，不追求快速夺舍，而是将吞噬的神魂慢慢炼化，提取精纯魂力融入自身魔魂，炼就不灭魔魂，魔魂越强肉身与修为同步提升，然炼化神魂耗时极长，易被正道修士趁机围剿...",
-                        correspondingLevel4: "魔魂皇",
-                        plotChoice: {
-                            intro: "你修成神魂炼魔诀，魔魂已近不灭，仙界仙魂强者率大军围剿魔族：要么携不灭魔魂，主动挑战仙魂强者打破压制；要么以不灭魔魂，守护魔族幼魂抵御仙佛迫害...",
-                            options: [
-                                { id: 'plot1', name: "携不灭魔魂，与仙界仙魂强者大战到底", targetEnd: 2232 },
-                                { id: 'plot2', name: "心生善念，以不灭魔魂守护魔族幼魂", targetEnd: 2233 }
-                            ]
-                        },
-                        level5: [
-                            {id: 2231, name: "炼就不灭魔魂", desc: "吞噬亿万神魂，炼就不灭魔魂", detail: "你修神魂炼魔诀大成后，耗时千年，吞噬亿万神魂，炼就真正的不灭魔魂，无惧任何神魂攻击，被魔族尊为魔魂皇，掌不灭魔魂之力，可随意穿梭诸天，不受肉身束缚。", correspondingLevel4: "魔魂皇"},
-                            {id: 2232, name: "魔魂战仙魂", desc: "携不灭魔魂，与仙界仙魂大战", detail: "你修神魂炼魔诀至巅峰，携不灭魔魂，主动挑战仙界仙魂强者，历经千战不败，打破仙魂压制魔魂的桎梏，最终成为魔魂帝，掌世间魔魂法则，让魔魂不再受仙魂欺凌。", correspondingLevel4: "魔魂帝"},
-                            {id: 2233, name: "守护魔魂", desc: "以不灭魔魂，守护魔族幼魂", detail: "你修神魂炼魔诀后，心生善念（魔之善念），以不灭魔魂守护魔族幼魂，抵御仙佛强者的迫害，成为魔族幼魂的守护神，被魔族后辈敬仰，最终成为护魂魔尊，掌世间护魂之道。", correspondingLevel4: "护魂魔尊"}
-                        ]}
-                    ],
-                    "炼魔流": [
-                        // 修复ID重复：231→2311
-                        {id: 2311, name: "万魔归宗诀", desc: "号令万魔，归宗于我", detail: "万魔归宗诀为炼魔流第一秘术，可号令天下万魔，融万魔之力于一体。",
-                        intro: "万魔归宗诀乃炼魔流统御功法，修至入门可号令普通魔物，大成可化身为万魔之主，身具万魔特性，力量无穷，然号令万魔需极强的魔威，魔威不足者会被万魔反噬，沦为万魔的养料...",
-                        correspondingLevel4: "万魔皇",
-                        plotChoice: {
-                            intro: "你修成万魔归宗诀，可号令诸天万魔，魔族内乱不休各据一方：要么率万魔踏平仙界，组建无敌魔军统御天下；要么与各大魔尊重组秩序，共治魔族摆脱内乱...",
-                            options: [
-                                { id: 'plot1', name: "号令诸天万魔，组建魔军踏平仙界", targetEnd: 2311 },
-                                { id: 'plot2', name: "与各大魔尊重组秩序，共治魔族共兴魔道", targetEnd: 2313 }
-                            ]
-                        },
-                        level5: [
-                            {id: 2311, name: "统御万魔", desc: "号令诸天万魔，组建魔军", detail: "你修万魔归宗诀大成后，号令诸天万魔，组建起一支无敌魔军，踏平仙界边缘城池，统御天下魔族，被尊为万魔皇，掌万魔号令之力，万魔皆听你差遣。", correspondingLevel4: "万魔皇"},
-                            {id: 2312, name: "万魔合一", desc: "融万魔之力于自身，化身为魔主", detail: "你修万魔归宗诀至巅峰，将收服的万魔之力全部融入自身，化身为真正的万魔之主，力量远超普通魔帝，可与仙界仙帝分庭抗礼，最终成为万魔帝，掌世间万魔法则，威慑诸天。", correspondingLevel4: "万魔帝"},
-                            {id: 2313, name: "魔族共治", desc: "与各大魔尊重组魔族秩序，共治魔族", detail: "你修万魔归宗诀大成后，不恋独权，与各大魔尊重组魔族秩序，共治魔族，让魔族摆脱内乱，日益强盛，最终成为魔族共主，受所有魔族尊重，掌魔族秩序法则。", correspondingLevel4: "魔族共主"}
-                        ]},
-                        {id: 232, name: "混沌魔体诀", desc: "炼混沌魔体，融万魔之魂", detail: "混沌魔体诀为炼魔流最逆天的功法，以混沌之气为引，炼就混沌魔体。",
-                        intro: "混沌魔体诀乃炼魔流最逆天功法，需寻得混沌之气为引，炼就混沌魔体，融万魔之魂于其中，魔体强度与力量同步提升，大成可硬抗仙帝一击，然混沌之气极其稀有，且炼体时需承受万魔噬心之痛，意志不坚者直接爆体...",
-                        correspondingLevel4: "混沌魔皇",
-                        plotChoice: {
-                            intro: "你修成混沌魔体诀，炼就混沌魔体，混沌之地出现外敌抢夺混沌之气：要么前往混沌之地，吞噬无尽混沌之气完善魔体；要么驻守混沌之门，抵御外敌守护混沌之气...",
-                            options: [
-                                { id: 'plot1', name: "前往混沌之地，吞噬无尽混沌之气突破帝境", targetEnd: 2322 },
-                                { id: 'plot2', name: "主动驻守混沌之门，抵御仙魔外敌入侵", targetEnd: 2323 }
-                            ]
-                        },
-                        level5: [
-                            {id: 2321, name: "混沌魔体战仙帝", desc: "炼就混沌魔体，正面硬抗仙帝", detail: "你修混沌魔体诀大成后，炼就完美混沌魔体，孤身一人前往仙界，正面硬抗仙帝攻击，不落下风，一战成名，被魔族尊为混沌魔皇，掌混沌魔体之力，无人可挡。", correspondingLevel4: "混沌魔皇"},
-                            {id: 2322, name: "吞噬混沌之气", desc: "前往混沌之地，吞噬混沌之气", detail: "你修混沌魔体诀后，为突破境界，前往混沌之地，吞噬无尽混沌之气，混沌魔体日益完善，最终突破至魔帝之境，成为混沌魔帝，掌世间混沌魔之道，与混沌共存。", correspondingLevel4: "混沌魔帝"},
-                            {id: 2323, name: "守护混沌之门", desc: "驻守混沌之门，抵御外敌入侵", detail: "你修混沌魔体诀大成后，主动驻守混沌之门，抵御那些妄图抢夺混沌之气的仙魔强者，以身护道，最终成为混沌守门魔尊，掌混沌之门的开启与关闭，守护混沌之地的安宁。", correspondingLevel4: "混沌守门魔尊"}
-                        ]},
-                        {id: 233, name: "魔祖炼魔诀", desc: "承魔祖传承，炼魔之根本", detail: "魔祖炼魔诀为炼魔流本源功法，传自魔祖，层层打磨魔体与魔魂。",
-                        intro: "魔祖炼魔诀乃炼魔流正统功法，传自魔祖本身，不追求速成，层层打磨魔体与魔魂，修至大成可继承魔祖部分力量，号令万魔，是炼魔流最稳妥、最正宗的功法，然修炼进度极慢，易被同门视为庸才...",
-                        correspondingLevel4: "魔祖帝",
-                        plotChoice: {
-                            intro: "你修成魔祖炼魔诀，得到魔祖认可可继承其力量：要么继承魔祖之力，统御天下魔族壮大魔道；要么广收弟子，传承魔祖炼魔诀让魔道延续；要么隐于魔界，潜心修炼不问纷争...",
-                            options: [
-                                { id: 'plot1', name: "继承魔祖部分力量，统御天下魔族", targetEnd: 2331 },
-                                { id: 'plot2', name: "广收弟子，传承魔祖炼魔诀培育后辈", targetEnd: 2332 }
-                            ]
-                        },
-                        level5: [
-                            {id: 2331, name: "继承魔祖之力", desc: "修至大成，继承魔祖部分力量", detail: "你修魔祖炼魔诀大成后，得到魔祖认可，继承魔祖部分力量，成为魔祖继承人，统御天下魔族，继续壮大魔族势力，最终成为魔祖帝，掌魔祖之道，受万魔敬仰。", correspondingLevel4: "魔祖帝"},
-                            {id: 2332, name: "传承魔祖炼魔诀", desc: "广收弟子，传承魔祖炼魔诀", detail: "你修魔祖炼魔诀大成后，广收魔族弟子，挑选有资质、有道心之辈，传承魔祖炼魔诀，培育出无数炼魔强者，让魔祖之道得以延续，最终成为炼魔宗师，掌炼魔法则，统御天下炼魔修士。", correspondingLevel4: "炼魔宗师"},
-                            {id: 2333, name: "隐居炼魔", desc: "隐于魔界深处，潜心修炼魔祖之道", detail: "你修魔祖炼魔诀后，不恋权柄，隐于魔界深处，潜心修炼魔祖之道，不问魔族纷争，最终修至魔帝之境，成为隐世魔尊，虽不掌权，却拥有撼动诸天的力量。", correspondingLevel4: "隐世魔尊"}
-                        ]}
+                        {
+                            name:"天地养寿诀", 
+                            realm:"养寿帝", 
+                            plot4:"你借昆仑山脉灵气养寿，寿元达万年，却看到昆仑山脉三日后将因仙魔大战崩塌，你也会寿元尽散而亡。唯一选择：要么斩断灵根，另寻山川；要么以身护山，与昆仑共存亡。",
+                            choices:["斩断天地灵根，舍弃万年寿元，另寻山川养寿", "以身护山，催动寿元抵挡仙魔大战，与昆仑共存亡"],
+                            ends:["你斩断灵根，舍弃万年寿元，寻得江南小川养寿，寿元五千年，逍遥度日", "你以身护山，催动寿元抵挡仙魔，昆仑得以保全，你却寿元骤减，成昆仑山神，受万世敬仰"]
+                        }
                     ]
                 }
-            },
-            大荒神陨录: {
-                intro: "大荒神陨录乃上古大荒战神传承，核心为‘神兽’‘神血’‘古法’，修炼者以力证道，以血献祭，一往无前，功法霸道无比，然需承接大荒诸神的考验，无缘者修之必遭天谴...",
-                level2: [
-                    {id: 41, name: "神兽流", desc: "召唤神兽，借兽之力", detail: "神兽流为大荒神陨录核心一脉，可召唤上古神兽，借神兽之力为自身所用", intro: "神兽流以“召唤”为核心，可沟通上古大荒诸神麾下神兽，借神兽之力作战，神兽越强战力越高，然召唤顶级神兽需以自身精血为祭，精血损耗过多易导致修为大跌...", },
-                    {id: 42, name: "神血流", desc: "融合神血，炼就神体", detail: "神血流为大荒神陨录最霸道的一脉，融合上古诸神的神血炼就无上神体", intro: "神血流以“融合”为核心，融合上古诸神的精纯神血，炼就无上神体，神血越纯神体越强，然神血极其稀有，且融合时需承受神血的威压，肉身脆弱者直接被神血压爆...", },
-                    {id: 43, name: "古法流", desc: "修炼古法，承神传承", detail: "古法流为大荒神陨录本源一脉，修炼上古诸神的古法秘术承接诸神传承", intro: "古法流以“传承”为核心，修炼上古大荒诸神的古法秘术，承接诸神的传承与权柄，修至大成可号令大荒生灵，然古法晦涩难懂，悟性不足者终其一生难窥门径...", }
-                ],
-                level3: {
-                    神兽流: [
-                        {id: 411, name: "神兽召唤诀", desc: "召唤上古神兽，统御兽军", detail: "神兽召唤诀为神兽流第一秘术，可召唤上古诸神麾下神兽，统御神兽大军", intro: "神兽召唤诀乃神兽流统御功法，修至入门可召唤普通上古神兽，大成可召唤神兽之王，组建神兽大军，然统御神兽需极强的兽缘与精神力，精神力不足者会被神兽反噬，沦为神兽的坐骑...",
-                        correspondingLevel4: "神兽皇",
-                        plotChoice: {
-                            intro: "你修成神兽召唤诀，可召唤神兽之王，仙魔联军入侵大荒之地：要么召唤神兽之王，组建兽军征战诸天踏平仙魔；要么放弃征伐，守护神兽栖息地抵御仙魔捕捉...",
-                            options: [
-                                { id: 'plot1', name: "召唤神兽之王，组建兽军征战诸天", targetEnd: 4111 },
-                                { id: 'plot2', name: "守护神兽栖息地，抵御仙魔外敌捕捉", targetEnd: 4113 }
-                            ]
+            ],
+            天魔策: [
+                {
+                    flow:"血魔流", 
+                    plot2:"《天魔策》化作一道血雾，钻入你的喉咙，一股嗜血的欲望在心底滋生。你低头看去，双手竟覆盖上一层血色鳞甲，指尖利爪闪烁着寒光。守陵长老虚影的声音带着寒意：「血魔者，以血为食，以杀为道，你可愿堕入魔道？」",
+                    skills: [
+                        {
+                            name:"万血噬魔功", 
+                            realm:"血魔帝", 
+                            plot4:"你站在仙魔结界前，怀中藏着圣兽精血，却远不及仙帝精血。仙界结界大开，仙帝瑶池设宴，夺血易如反掌，却会引来仙界诸神围剿。",
+                            choices:["撕裂结界，潜入瑶池，弑帝夺取仙帝精血", "放弃夺血，炼化圣兽精血，铸就不完美魔躯"],
+                            ends:["你弑帝夺血，铸就完美魔躯，统御魔界万族，仙神皆惧，成万古第一魔帝", "你炼化圣兽精血，魔躯虽有瑕疵，却威震魔界，镇守边疆，成魔道守护神"]
                         },
-                        level5: [
-                            {id: 4111, name: "召唤神兽之王，统御兽军", desc: "召唤上古神兽之王，组建神兽大军，征战诸天", detail: "你修神兽召唤诀大成后，可召唤上古神兽之王，组建起一支无敌神兽大军，征战诸天，踏平仙界、魔界，统御天下神兽，被尊为神兽皇，掌神兽召唤之力，万兽皆听你差遣。", correspondingLevel4: "神兽皇"},
-                            {id: 4112, name: "神兽共生，借兽证道", desc: "与神兽之王共生，借神兽之力证道", detail: "你修神兽召唤诀至巅峰，与神兽之王共生，借神兽之王的力量突破境界，证得帝道，最终成为神兽帝，掌神兽法则，统御天下神兽与神兽修士。", correspondingLevel4: "神兽帝"},
-                            {id: 4113, name: "守护神兽栖息地", desc: "守护上古神兽栖息地，护佑神兽", detail: "你修神兽召唤诀大成后，放弃对外征伐，守护上古神兽的栖息地，抵御那些妄图捕捉、伤害神兽的仙魔强者，成为神兽守护神，最终成为神兽尊，掌神兽守护之道，与神兽共存。", correspondingLevel4: "神兽尊"}
-                        ]},
-                        {id: 412, name: "神兽合体诀", desc: "与神兽合体，融兽之力", detail: "神兽合体诀为神兽流最具爆发力的功法，可与神兽合体融合其力量", intro: "神兽合体诀乃神兽流爆发功法，修至入门可与普通神兽合体，大成可与神兽之王合体，化身为神兽人形，力量、速度、防御大幅提升，然合体时间有限，超时会导致自身意识被神兽意识吞噬...",
-                        correspondingLevel4: "合体皇",
-                        plotChoice: {
-                            intro: "你修成神兽合体诀，可与神兽之王合体，大荒之地遭魔主率军入侵：要么与神兽之王合体，正面硬抗魔主守护大荒；要么广收弟子，传承合体诀培育大荒强者...",
-                            options: [
-                                { id: 'plot1', name: "与神兽之王合体，正面硬抗魔主守护大荒", targetEnd: 4121 },
-                                { id: 'plot2', name: "广收有兽缘弟子，传承神兽合体诀", targetEnd: 4123 }
-                            ]
+                        {
+                            name:"血河炼魔身", 
+                            realm:"血河帝", 
+                            plot4:"你引血河之水炼体，即将突破血河帝，却感受到血河之魂正在反噬自身，即将掌控你的意识。唯一选择：要么压制血河之魂，自废一成魔功；要么融合血河之魂，成血河之主。",
+                            choices:["压制血河之魂，自废一成魔功，保留自身意识", "融合血河之魂，成血河之主，掌魔界血河之力"],
+                            ends:["你压制血河之魂，保留意识，成血河帝，镇守血河边界，不扰三界，成魔道孤皇", "你融合血河之魂，成血河之主，掌魔界无尽血河，魔威撼天，仙魔两界皆不敢犯"]
+                        }
+                    ]
+                },
+                {
+                    flow:"噬魂流", 
+                    plot2:"《天魔策》钻入你的识海，无数魔物的魂魄在你脑海中嘶吼。你心念一动，便能吞噬身边的游魂，魂力暴涨。守陵长老虚影冷笑道：「噬魂者，可夺舍他人肉身，永生不死，你敢做这逆天之事吗？」",
+                    skills: [
+                        {
+                            name:"噬魂夺舍诀", 
+                            realm:"噬魂魔皇", 
+                            plot4:"你修成噬魂魔皇，魔躯却因征战受损，时日无多。恰逢昊天仙帝渡劫濒死、九幽魔主重伤垂危，两者皆是完美肉身，夺舍其一便可重生。",
+                            choices:["趁虚而入，夺舍昊天仙帝残躯，仙魔同体称霸", "潜入魔宫，夺舍九幽魔主肉身，威慑九天仙庭"],
+                            ends:["你夺舍仙帝残躯，仙魔同体，战力三界第一，称霸仙魔两界，万古无人敢撄其锋芒", "你夺舍魔主肉身，以噬魂之力威慑仙庭，仙界诸神闭门不出，你成魔界无上皇者"]
                         },
-                        level5: [
-                            {id: 4121, name: "与神兽之王合体，战仙帝魔帝", desc: "与神兽之王合体，化身为神兽人形，正面硬抗仙帝魔帝", detail: "你修神兽合体诀大成后，与神兽之王合体，化身为神兽人形，力量远超普通帝境强者，正面硬抗仙帝、魔帝，不落下风，一战成名，被尊为合体皇，掌神兽合体之力，无人可挡。", correspondingLevel4: "合体皇"},
-                            {id: 4122, name: "合体护大荒", desc: "与神兽合体，守护大荒之地", detail: "你修神兽合体诀至巅峰，与神兽合体，守护上古大荒之地，抵御仙魔入侵，守护大荒生灵安宁，最终成为合体帝，掌神兽合体法则，统御天下神兽合体修士。", correspondingLevel4: "合体帝"},
-                            {id: 4123, name: "传承合体术", desc: "广收弟子，传承神兽合体诀", detail: "你修神兽合体诀大成后，广收弟子，挑选有兽缘之辈，传承神兽合体诀，培育出无数神兽合体强者，让神兽合体术得以延续，最终成为合体宗师，掌神兽合体修炼之道。", correspondingLevel4: "合体宗师"}
-                        ]},
-                        {id: 413, name: "神兽御敌诀", desc: "指挥神兽，御敌于千里之外", detail: "神兽御敌诀为神兽流最具实用性的功法，指挥神兽提前布局御敌", intro: "神兽御敌诀乃神兽流实战功法，修至入门可指挥十数只神兽布局，大成可指挥亿万神兽形成神兽风暴，毁天灭地，然指挥神兽需时刻保持指挥统一，稍有混乱便会导致神兽自相残杀...",
-                        correspondingLevel4: "神兽战皇",
-                        plotChoice: {
-                            intro: "你修成神兽御敌诀，可指挥亿万神兽，魔界魔主率大军入侵大荒：要么指挥亿万神兽形成风暴，斩杀魔主；要么指挥神兽大军，掌控仙魔大战战局助大荒取胜...",
-                            options: [
-                                { id: 'plot1', name: "指挥亿万神兽，形成风暴斩杀魔界魔主", targetEnd: 4131 },
-                                { id: 'plot2', name: "指挥神兽大军，掌控战局助大荒击败魔族", targetEnd: 4132 }
-                            ]
-                        },
-                        level5: [
-                            {id: 4131, name: "指挥亿万神兽，形成风暴诛魔", desc: "指挥亿万神兽，形成风暴斩杀魔界魔主", detail: "你修神兽御敌诀大成后，指挥亿万神兽，形成神兽风暴，前往魔界，斩杀魔界魔主，守护仙界与大荒安宁，被尊为神兽战皇，掌神兽御敌之力，威慑诸天。", correspondingLevel4: "神兽战皇"},
-                            {id: 4132, name: "指挥神兽，掌控战局", desc: "指挥神兽大军，掌控仙魔大战战局", detail: "你修神兽御敌诀至巅峰，指挥神兽大军，在仙魔大战中掌控战局，助仙界与大荒击败魔族，维护天地秩序，最终成为神兽战帝，掌神兽御敌法则，统御天下神兽实战修士。", correspondingLevel4: "神兽战帝"},
-                            {id: 4133, name: "携神兽，游历大荒", desc: "携神兽，游历上古大荒，护佑生灵", detail: "你修神兽御敌诀大成后，携心爱的神兽，游历上古大荒，护佑大荒生灵，击败那些伤害生灵的凶兽，最终成为神兽仙翁，掌神兽御敌与守护之道，逍遥大荒之中。", correspondingLevel4: "神兽仙翁"}
-                        ]}
-                    ],
-                    神血流: [
-                        {id: 421, name: "诸神血炼诀", desc: "融合诸神血，炼就神体", detail: "诸神血炼诀为神血流第一秘术，融合上古诸神神血，炼就无上混沌神体", intro: "诸神血炼诀乃神血流至尊功法，修至入门可融合普通神血，大成可融合亿万神血炼就混沌神体，肉身不灭，然融合神血时需承受诸神的意志考验，心术不正者会被诸神意志抹杀...",
-                        correspondingLevel4: "神血皇",
-                        plotChoice: {
-                            intro: "你修成诸神血炼诀，可融合亿万神血，大荒诸神意志现身考验：要么融合亿万神血，炼就完美混沌神体；要么借神血之力，突破帝境桎梏证得神血帝道...",
-                            options: [
-                                { id: 'plot1', name: "遍历大荒，融合亿万神血炼就混沌神体", targetEnd: 4211 },
-                                { id: 'plot2', name: "借诸神血之力，突破境界证得神血帝道", targetEnd: 4212 }
-                            ]
-                        },
-                        level5: [
-                            {id: 4211, name: "融合亿万神血，炼就混沌神体", desc: "融合亿万上古诸神的神血，炼就完美混沌神体", detail: "你修诸神血炼诀大成后，耗时万年，融合亿万上古诸神的神血，炼就完美混沌神体，肉身不灭，力量无穷，可与天地同寿，被尊为神血皇，掌神血之力，受万仙敬仰。", correspondingLevel4: "神血皇"},
-                            {id: 4212, name: "借神血之力，证得帝道", desc: "借诸神血之力，突破境界，证得帝道", detail: "你修诸神血炼诀至巅峰，借诸神血之力，突破帝境桎梏，证得帝道，成为神血帝，掌神血法则，统御天下神血修士，可随意操控神血之力。", correspondingLevel4: "神血帝"},
-                            {id: 4213, name: "守护神血传承", desc: "守护上古诸神血传承，不被恶人夺取", detail: "你修诸神血炼诀大成后，主动守护上古诸神的神血传承，抵御那些妄图夺取神血、为非作歹的仙魔强者，成为神血守护神，最终成为神血尊，掌神血守护之道，传承诸神血脉。", correspondingLevel4: "神血尊"}
-                        ]},
-                        {id: 422, name: "神血疗伤诀", desc: "以神血之力，疗伤续命", detail: "神血疗伤诀为神血流最具功德的功法，以神血之力修复神魂肉身损伤，活死人肉白骨", intro: "神血疗伤诀乃神血流辅助功法，修至入门可修复普通生灵损伤，大成可活死人肉白骨，然疗伤时需将自身神血注入伤者体内，神血损耗过多会导致自身神体退化，沦为凡人...",
-                        correspondingLevel4: "神血医皇",
-                        plotChoice: {
-                            intro: "你修成神血疗伤诀，可活死人肉白骨，仙魔大战后大荒万灵皆伤：要么以神血之力，救治大荒所有受伤生灵；要么为诸神后裔续命，传承上古神脉...",
-                            options: [
-                                { id: 'plot1', name: "耗尽神血之力，救治大荒所有受伤万灵", targetEnd: 4221 },
-                                { id: 'plot2', name: "为诸神后裔续命，传承上古诸神血脉", targetEnd: 4222 }
-                            ]
-                        },
-                        level5: [
-                            {id: 4221, name: "神血疗伤救万灵", desc: "以神血之力，救治大荒万灵，修复损伤", detail: "你修神血疗伤诀大成后，游历上古大荒，以神血之力救治无数受伤的生灵，修复其肉身与神魂损伤，泽被大荒，功德无量，被尊为神血医皇，掌神血疗伤之力，受万灵敬仰。", correspondingLevel4: "神血医皇"},
-                            {id: 4222, name: "神血续命救诸神后裔", desc: "以神血之力，为诸神后裔续命，传承神脉", detail: "你修神血疗伤诀至巅峰，以神血之力，为那些寿元将尽、神脉衰弱的诸神后裔续命，传承诸神血脉，最终成为神血续命帝，掌神血续命法则，统御天下神血疗伤修士。", correspondingLevel4: "神血续命帝"},
-                            {id: 4223, name: "开设神血医馆", desc: "在大荒开设神血医馆，救治有缘人", detail: "你修神血疗伤诀大成后，在大荒之地开设神血医馆，不问身份，救治所有心怀善意的有缘人，无论是人、仙还是兽，皆可得到你的救治，最终成为神血医尊，掌神血医道法则。", correspondingLevel4: "神血医尊"}
-                        ]},
-                        {id: 423, name: "神血攻伐诀", desc: "以神血之力，攻伐御敌", detail: "神血攻伐诀为神血流最具杀伤力的功法，以神血之力凝聚诸神血刃，一刀斩断天地", intro: "神血攻伐诀乃神血流实战功法，修至入门可凝聚普通神血刃，大成可凝聚诸神血刃，一刀斩断天地，然神血刃威力极强，操控不当易反噬自身，斩断自身经脉...",
-                        correspondingLevel4: "神血战皇",
-                        plotChoice: {
-                            intro: "你修成神血攻伐诀，可凝聚诸神血刃，魔界魔主率军入侵大荒：要么凝聚诸神血刃，一刀斩杀魔界魔主；要么以神血攻伐之力，守护大荒之地抵御仙魔入侵...",
-                            options: [
-                                { id: 'plot1', name: "凝聚诸神血刃，一刀斩杀魔界魔主", targetEnd: 4231 },
-                                { id: 'plot2', name: "以神血攻伐之力，守护大荒之地抵御入侵", targetEnd: 4232 }
-                            ]
-                        },
-                        level5: [
-                            {id: 4231, name: "诸神血刃斩魔主", desc: "凝聚诸神血刃，一刀斩杀魔界魔主", detail: "你修神血攻伐诀大成后，凝聚上古诸神血刃，一刀斩杀魔界魔主，一战成名，威慑诸天，被尊为神血战皇，掌神血攻伐之力，无人可挡。", correspondingLevel4: "神血战皇"},
-                            {id: 4232, name: "神血攻伐护大荒", desc: "以神血攻伐之力，守护大荒之地", detail: "你修神血攻伐诀至巅峰，以神血攻伐之力，守护上古大荒之地，抵御仙魔入侵，守护大荒生灵安宁，最终成为神血战帝，掌神血攻伐法则，统御天下神血实战修士。", correspondingLevel4: "神血战帝"},
-                            {id: 4233, name: "传承神血攻伐术", desc: "广收弟子，传承神血攻伐诀", detail: "你修神血攻伐诀大成后，广收弟子，挑选有神缘之辈，传承神血攻伐诀，培育出无数神血攻伐强者，让神血攻伐术得以延续，最终成为神血宗师，掌神血攻伐修炼之道。", correspondingLevel4: "神血宗师"}
-                        ]}
-                    ],
-                    古法流: [
-                        {id: 431, name: "大荒古法诀", desc: "修炼大荒古法，承诸神传承", detail: "大荒古法诀为古法流本源功法，修炼上古诸神古法秘术，承接诸神权柄", intro: "大荒古法诀乃古法流正统功法，修至入门可修炼普通古法，大成可承接诸神权柄，号令大荒生灵，然古法秘术晦涩难懂，需耗费大量时间感悟，易被仙魔强者趁机偷袭...",
-                        correspondingLevel4: "古法皇",
-                        plotChoice: {
-                            intro: "你修成大荒古法诀，得到诸神认可可承接权柄：要么继承诸神权柄，号令大荒所有生灵；要么广收弟子，传承大荒古法培育大荒强者...",
-                            options: [
-                                { id: 'plot1', name: "继承诸神权柄，号令大荒所有生灵", targetEnd: 4311 },
-                                { id: 'plot2', name: "广收弟子，传承大荒古法培育后辈", targetEnd: 4312 }
-                            ]
-                        },
-                        level5: [
-                            {id: 4311, name: "继承诸神权柄，号令大荒生灵", desc: "修至大成，继承诸神权柄，号令上古大荒所有生灵", detail: "你修大荒古法诀大成后，得到上古诸神的认可，继承诸神的部分权柄，可号令上古大荒所有生灵，统御大荒，被尊为古法皇，掌大荒古法之力，受万灵敬仰。", correspondingLevel4: "古法皇"},
-                            {id: 4312, name: "传承大荒古法，培育后辈", desc: "广收弟子，传承大荒古法，培育大荒强者", detail: "你修大荒古法诀至巅峰，广收弟子，挑选有悟性之辈，传承大荒古法，培育出无数大荒强者，让大荒古法得以延续，最终成为古法帝，掌大荒古法法则，统御天下古法修士。", correspondingLevel4: "古法帝"},
-                            {id: 4313, name: "隐于大荒，潜心悟道", desc: "隐于上古大荒深处，潜心修炼古法之道", detail: "你修大荒古法诀大成后，不恋权柄，隐于上古大荒深处，潜心修炼古法之道，悟透诸神传承的真谛，最终成为古法仙翁，掌大荒古法之道，与大荒共存，永世不灭。", correspondingLevel4: "古法仙翁"}
-                        ]},
-                        {id: 432, name: "诸神召唤诀", desc: "召唤诸神残魂，借神之力", detail: "诸神召唤诀为古法流最神秘的功法，可召唤上古诸神残魂，借诸神之力作战", intro: "诸神召唤诀乃古法流神秘功法，修至入门可召唤普通诸神残魂，大成可召唤诸神残魂合体，拥有毁天灭地之力，然召唤诸神残魂需以自身神魂为引，神魂损耗过多易导致魂飞魄散...",
-                        correspondingLevel4: "诸神召唤皇",
-                        plotChoice: {
-                            intro: "你修成诸神召唤诀，可召唤诸神残魂合体，大荒因仙魔大战受损严重：要么召唤诸神残魂合体，与仙帝魔帝大战；要么借诸神残魂之力，修复大荒受损之地...",
-                            options: [
-                                { id: 'plot1', name: "召唤诸神残魂合体，与仙帝魔帝正面大战", targetEnd: 4321 },
-                                { id: 'plot2', name: "借诸神残魂之力，修复大荒仙魔大战损伤", targetEnd: 4322 }
-                            ]
-                        },
-                        level5: [
-                            {id: 4321, name: "召唤诸神残魂，合体战帝境", desc: "召唤上古诸神残魂，合体后与仙帝魔帝大战", detail: "你修诸神召唤诀大成后，召唤上古诸神残魂，与诸神残魂合体，力量远超普通帝境强者，正面与仙帝、魔帝大战，不落下风，被尊为诸神召唤皇，掌诸神召唤之力，威慑诸天。", correspondingLevel4: "诸神召唤皇"},
-                            {id: 4322, name: "借诸神残魂之力，修复大荒", desc: "借诸神残魂之力，修复上古大荒的损伤", detail: "你修诸神召唤诀至巅峰，借诸神残魂之力，修复上古大荒因仙魔大战造成的损伤，恢复大荒生机，功德无量，最终成为诸神召唤帝，掌诸神召唤法则，统御天下诸神召唤修士。", correspondingLevel4: "诸神召唤帝"},
-                            {id: 4323, name: "守护诸神残魂", desc: "守护上古诸神残魂，不被恶人吞噬", detail: "你修诸神召唤诀大成后，主动守护上古诸神的残魂，抵御那些妄图吞噬诸神残魂、提升自身修为的仙魔强者，成为诸神残魂守护神，最终成为诸神召唤尊，掌诸神残魂守护之道。", correspondingLevel4: "诸神召唤尊"}
-                        ]},
-                        {id: 433, name: "大荒防御诀", desc: "修炼大荒防御古法，守护自身与他人", detail: "大荒防御诀为古法流最具防御性的功法，修炼上古防御古法，形成大荒守护屏障", intro: "大荒防御诀乃古法流防御功法，修至入门可形成普通守护屏障，大成可形成大荒不灭屏障，硬抗帝境一击，然防御屏障需耗费大量大荒本源之力，本源之力耗尽屏障便会破碎...",
-                        correspondingLevel4: "大荒守护皇",
-                        plotChoice: {
-                            intro: "你修成大荒防御诀，可形成大荒不灭屏障，仙魔联军入侵大荒屠戮生灵：要么化身为大荒屏障，守护大荒所有生灵；要么隐于大荒深处，以屏障守护大荒本源之地...",
-                            options: [
-                                { id: 'plot1', name: "化身为大荒屏障，守护大荒所有生灵", targetEnd: 4331 },
-                                { id: 'plot2', name: "隐于大荒深处，守护大荒本源之地", targetEnd: 4333 }
-                            ]
-                        },
-                        level5: [
-                            {id: 4331, name: "大荒屏障护万灵", desc: "化身为大荒不灭屏障，守护大荒万灵", detail: "你修大荒防御诀大成后，化身为大荒不灭屏障，将整个大荒笼罩其中，抵御仙魔联军的攻击，守护大荒所有生灵，功德无量，被尊为大荒守护皇，掌大荒防御之力，受万灵敬仰。", correspondingLevel4: "大荒守护皇"},
-                            {id: 4332, name: "大荒屏障战诸天", desc: "携大荒屏障，与仙魔诸天强者大战", detail: "你修大荒防御诀至巅峰，以大荒不灭屏障为盾，正面与仙魔诸天强者大战，防御无双，无人可破，最终成为大荒守护帝，掌大荒防御法则，统御天下古法防御修士。", correspondingLevel4: "大荒守护帝"},
-                            {id: 4333, name: "守护大荒本源", desc: "隐于大荒本源之地，潜心守护古法传承", detail: "你修大荒防御诀后，不恋红尘纷争，隐于大荒本源之地，以大荒屏障守护古法传承与大荒本源，最终修至仙尊之境，成为大荒守护仙翁，掌大荒防御与传承之道，与大荒共存。", correspondingLevel4: "大荒守护仙翁"}
-                        ]}
+                        {
+                            name:"万魂融神诀", 
+                            realm:"万魂帝", 
+                            plot4:"你融合九千九百九十九道神魂，即将铸就万魂神体，却听到识海万魂嘶吼，自身意识正在逐渐迷失。唯一选择：要么舍弃千道神魂，稳固自身意识；要么融合最后一道神魂，成万魂帝，赌自身本心。",
+                            choices:["舍弃千道神魂，稳固自身意识，暂缓突破", "融合最后一道神魂，成万魂帝，以本心压制万魂"],
+                            ends:["你舍弃千道神魂，稳固意识，成九千魂帝，掌九千魂力，保留本心，逍遥魔界", "你融合万魂成帝，以强大本心压制万魂嘶吼，掌魔界万魂之力，成万魂之主，魔威盖世"]
+                        }
                     ]
                 }
-            }
+            ]
         };
 
-        // 全局选择状态
-        const selectState = {
-            rootKey: '',    // 选中的根功法
-            level2: '',     // 选中的level2流派
-            level3: '',     // 选中的level3功法
-            plotChoice: ''  // 选中的剧情选择
-        };
+        let currentFlow = null; // 存储当前选定的流派
 
-        // 获取DOM节点
-        const rootStep = document.getElementById('root-step');
-        const level2Step = document.getElementById('level2-step');
-        const level3Step = document.getElementById('level3-step');
-        const level4Step = document.getElementById('level4-step');
-        const level5Step = document.getElementById('level5-step');
-        const plotChoiceStep = document.getElementById('plot-choice-step');
-        const plotIntro = document.getElementById('plot-intro');
-        const plotOptions = document.getElementById('plot-options');
-        const jumpTip = document.getElementById('jump-tip');
-        const countdown = document.getElementById('countdown');
-        // 弹窗相关DOM
-        const detailModal = document.getElementById('detailModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalDetail = document.getElementById('modalDetail');
-        const closeModal = document.querySelector('.close-modal');
+        // 显示指定步骤，隐藏其他步骤
+        function showStep(stepId) {
+            document.querySelectorAll(".step").forEach(step => step.classList.remove("active"));
+            document.getElementById(stepId).classList.add("active");
+        }
 
-        // 根功法选择事件（切换根功法剧情介绍）
-        rootStep.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('option')) return;
-            // 更新选择状态
-            selectState.rootKey = e.target.dataset.key;
-            // 标记选中样式
-            rootStep.querySelectorAll('.option').forEach(item => item.classList.remove('selected'));
-            e.target.classList.add('selected');
-            // 更新根功法剧情介绍（空值容错）
-            const intro = storyData[selectState.rootKey]?.intro || '此功法暂无背景介绍...';
-            document.getElementById('root-intro').innerHTML = `<h4>${selectState.rootKey} - 功法背景</h4><p>${intro}</p>`;
-            // 渲染level2
-            renderLevel2();
+        // 根功法选择 - 绑定背景切换+流派渲染
+        document.querySelectorAll("[data-root]").forEach(btn => {
+            btn.onclick = function() {
+                const root = this.dataset.root;
+                const bgClass = this.dataset.bg;
+                // 切换道途专属背景
+                document.body.className = bgClass;
+                // 渲染对应流派选项
+                const flowBox = document.getElementById("flow-options");
+                flowBox.innerHTML = "";
+                immortalData[root].forEach(flow => {
+                    const div = document.createElement("div");
+                    div.className = "option";
+                    div.innerText = flow.flow;
+                    div.onclick = () => {
+                        currentFlow = flow;
+                        document.getElementById("plot2").innerText = flow.plot2;
+                        renderSkills(); // 渲染秘术选项
+                        showStep("step3");
+                    };
+                    flowBox.appendChild(div);
+                });
+                showStep("step2");
+            };
         });
 
-        // 渲染level2流派（添加流派剧情介绍+初始默认值）
-        function renderLevel2() {
-            const { rootKey } = selectState;
-            const level2List = storyData[rootKey]?.level2 || [];
-            if (level2List.length === 0) return;
-
-            // 清空并渲染level2选项
-            level2Step.innerHTML = `
-                <h3>选择修行流派（${rootKey}）</h3>
-                <!-- 流派剧情介绍区域 -->
-                <div class="story-intro" id="level2-intro">
-                    <h4>流派背景</h4>
-                    <p>请选择具体的修行流派，不同流派将决定你的战斗方式与修行方向，仙魔殊途，慎选...</p>
-                </div>
-                <button class="back-btn" data-target="root">返回根功法选择</button>
-            `;
-            level2List.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'option';
-                div.dataset.name = item.name;
-                div.dataset.id = item.id;
-                div.innerHTML = `${item.name} - ${item.desc || '暂无描述'}`;
-                // 鼠标悬浮时更新剧情介绍（空值容错）
-                div.addEventListener('mouseenter', () => {
-                    const intro = item.intro || '此流派暂无背景介绍...';
-                    document.getElementById('level2-intro').innerHTML = `<h4>${item.name} - 流派背景</h4><p>${intro}</p>`;
-                });
-                level2Step.appendChild(div);
+        // 渲染秘术选项（双秘术）
+        function renderSkills() {
+            const skillBox = document.getElementById("skill-option");
+            skillBox.innerHTML = "";
+            currentFlow.skills.forEach((skill, idx) => {
+                const div = document.createElement("div");
+                div.className = "option skill-btn";
+                div.id = `skill-btn${idx+1}`;
+                div.innerText = `${skill.name} - 修成可证${skill.realm}之位`;
+                div.onclick = () => renderChoice(skill);
+                skillBox.appendChild(div);
             });
-
-            // 显示level2选择框
-            level2Step.style.display = 'block';
         }
 
-        // level2选择事件处理
-        function handleLevel2Select(e) {
-            if (!e.target.classList.contains('option')) return;
-            // 更新选择状态
-            selectState.level2 = e.target.dataset.name;
-            // 标记选中样式
-            level2Step.querySelectorAll('.option').forEach(item => item.classList.remove('selected'));
-            e.target.classList.add('selected');
-            // 渲染level3
-            renderLevel3();
-        }
-
-        // 渲染level3功法（添加核心功法剧情介绍+初始默认值）
-        function renderLevel3() {
-            const { rootKey, level2 } = selectState;
-            const level3List = storyData[rootKey]?.level3?.[level2] || [];
-            if (level3List.length === 0) return;
-
-            // 清空并渲染level3选项
-            level3Step.innerHTML = `
-                <h3>选择核心功法（${level2}）</h3>
-                <!-- 核心功法剧情介绍区域 -->
-                <div class="story-intro" id="level3-intro">
-                    <h4>功法背景</h4>
-                    <p>请选择核心功法，此功法将成为你一生的主修方向，决定你的核心战力与最终道途...</p>
-                </div>
-                <button class="back-btn" data-target="level2">返回流派选择</button>
-            `;
-            level3List.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'option';
-                div.dataset.name = item.name;
-                div.dataset.id = item.id;
-                div.dataset.level4 = item.correspondingLevel4 || '无专属境界';
-                div.innerHTML = `${item.name} - ${item.desc || '暂无描述'}`;
-                // 鼠标悬浮时更新剧情介绍（空值容错）
-                div.addEventListener('mouseenter', () => {
-                    const intro = item.intro || '此功法暂无背景介绍...';
-                    document.getElementById('level3-intro').innerHTML = `<h4>${item.name} - 功法背景</h4><p>${intro}</p>`;
-                });
-                level3Step.appendChild(div);
+        // 渲染剧情抉择选项
+        function renderChoice(skill) {
+            document.getElementById("plot4").innerText = skill.plot4;
+            const choiceBox = document.getElementById("choice-options");
+            choiceBox.innerHTML = "";
+            skill.choices.forEach((choice, idx) => {
+                const div = document.createElement("div");
+                div.className = "option";
+                div.innerText = choice;
+                div.onclick = () => showEnding(skill.ends[idx]);
             });
-
-            // 显示level3选择框
-            level3Step.style.display = 'block';
+            showStep("step4");
         }
 
-        // level3选择事件处理 + 渲染level4境界（补全默认值）
-        function handleLevel3Select(e) {
-            if (!e.target.classList.contains('option')) return;
-            // 更新选择状态
-            selectState.level3 = e.target.dataset.name;
-            // 标记选中样式
-            level3Step.querySelectorAll('.option').forEach(item => item.classList.remove('selected'));
-            e.target.classList.add('selected');
-            // 显示并渲染level4境界（默认值容错）
-            const level4Name = e.target.dataset.level4 || '无专属境界';
-            level4Step.innerHTML = `
-                <h3>当前绑定境界</h3>
-                <!-- 境界剧情介绍 -->
-                <div class="story-intro">
-                    <h4>${level4Name} - 境界背景</h4>
-                    <p>此境界为${selectState.level3 || '当前功法'}的专属境界，达到此境界后，你将掌握该功法的核心力量，开启最终的剧情抉择，你的每一个选择，都将决定最终的仙魔道途...</p>
-                </div>
-                <button class="back-btn" data-target="level3">返回核心功法选择</button>
-                <div class="option selected">${level4Name}</div>
-            `;
-            level4Step.style.display = 'block';
-            // 渲染结局前剧情选择
-            renderPlotChoice();
-        }
-
-        // 渲染结局前剧情选择（空值容错）
-        function renderPlotChoice() {
-            const { rootKey, level2, level3 } = selectState;
-            // 找到当前选中的level3功法
-            const level3List = storyData[rootKey]?.level3?.[level2] || [];
-            const currentLevel3 = level3List.find(item => item.name === level3);
-            const plotData = currentLevel3?.plotChoice || {};
-            
-            if (!plotData.options || plotData.options.length === 0) return;
-
-            // 更新剧情介绍（空值容错）
-            const plotIntroText = plotData.intro || '暂无剧情背景介绍，请直接选择...';
-            plotIntro.innerHTML = `<h4>关键抉择背景</h4><p>${plotIntroText}</p>`;
-            // 清空并渲染剧情选择项
-            plotOptions.innerHTML = '';
-            plotData.options.forEach(option => {
-                const div = document.createElement('div');
-                div.className = 'plot-option';
-                div.dataset.targetEnd = option.targetEnd;
-                div.innerHTML = option.name || '无选项名称';
-                plotOptions.appendChild(div);
-            });
-
-            // 显示剧情选择步骤
-            plotChoiceStep.style.display = 'block';
-            // 隐藏结局步骤（先选剧情再跳转）
-            level5Step.style.display = 'none';
-        }
-
-        // 剧情选择事件（添加选中样式+倒计时+类型统一）
-        function handlePlotChoice(e) {
-            if (!e.target.classList.contains('plot-option')) return;
-            // 添加强调选中样式
-            document.querySelectorAll('.plot-option').forEach(opt => opt.classList.remove('selected'));
-            e.target.classList.add('selected');
-            // 记录选择的剧情（统一转为数字，解决类型不匹配）
-            selectState.plotChoice = parseInt(e.target.dataset.targetEnd) || '';
-            // 显示跳转提示
-            jumpTip.style.display = 'block';
-            // 倒计时功能（3→2→1）
-            let count = 3;
-            countdown.innerText = count;
-            const timer = setInterval(() => {
-                count--;
-                countdown.innerText = count;
-                if (count <= 0) clearInterval(timer);
-            }, 1000);
-            // 禁用所有剧情选项
-            document.querySelectorAll('.plot-option').forEach(option => {
-                option.style.pointerEvents = 'none';
-                option.style.opacity = '0.7';
-            });
-            // 3秒后自动跳转到对应结局
+        // 显示结局（带3秒倒计时）
+        function showEnding(endText) {
+            const countdown = document.getElementById("countdown");
+            countdown.style.display = "block";
+            // 倒计时文本切换
+            setTimeout(() => countdown.innerHTML = "抉择已定，2秒后揭晓最终道途...", 1000);
+            setTimeout(() => countdown.innerHTML = "抉择已定，1秒后揭晓最终道途...", 2000);
+            // 3秒后显示结局
             setTimeout(() => {
-                renderLevel5(selectState.plotChoice);
-                // 隐藏剧情选择步骤
-                plotChoiceStep.style.display = 'none';
+                document.getElementById("plot5").innerText = endText;
+                showStep("step5");
+                countdown.style.display = "none";
             }, 3000);
         }
 
-        // 渲染level5最终结局（修复详情截取省略号+空值容错）
-        function renderLevel5(targetEndId) {
-            const { rootKey, level2, level3 } = selectState;
-            // 找到当前选中的level3功法
-            const level3List = storyData[rootKey]?.level3?.[level2] || [];
-            const currentLevel3 = level3List.find(item => item.name === level3);
-            const level5List = currentLevel3?.level5 || [];
-            
-            // 清空并渲染level5选项
-            level5Step.innerHTML = `
-                <h3>最终结局（${level3 || '当前功法'}）</h3>
-                <button class="back-btn" data-target="level4">返回境界查看</button>
-            `;
-
-            // 根据剧情选择定位对应结局
-            let targetEnd = null;
-            if (targetEndId && !isNaN(targetEndId)) {
-                targetEnd = level5List.find(item => item.id === targetEndId);
-                if (targetEnd) {
-                    const div = document.createElement('div');
-                    div.className = 'option selected';
-                    div.dataset.id = targetEnd.id;
-                    // 修复详情截取：不足80字符不显示省略号
-                    const detailPreview = targetEnd.detail || '暂无详细介绍';
-                    const previewText = detailPreview.length > 80 ? detailPreview.substring(0, 80) + '...' : detailPreview;
-                    div.innerHTML = `<strong>${targetEnd.name || '无结局名称'}</strong><br/>${targetEnd.desc || '暂无描述'}<br/>详情：${previewText}`;
-                    level5Step.appendChild(div);
-                    // 自动打开结局详情弹窗
-                    openDetailModalByEnd(targetEnd);
-                }
-            } else {
-                level5List.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'option';
-                    div.dataset.id = item.id;
-                    const detailPreview = item.detail || '暂无详细介绍';
-                    const previewText = detailPreview.length > 80 ? detailPreview.substring(0, 80) + '...' : detailPreview;
-                    div.innerHTML = `<strong>${item.name || '无结局名称'}</strong><br/>${item.desc || '暂无描述'}<br/>详情：${previewText}`;
-                    level5Step.appendChild(div);
-                });
-            }
-
-            // 显示level5选择框
-            level5Step.style.display = 'block';
+        // 重置所有状态（返回初始页面+恢复初始背景）
+        function resetAll() {
+            document.body.className = ""; // 清空背景类名，恢复初始背景
+            currentFlow = null; // 清空当前流派
+            showStep("step1"); // 返回根功法选择页
         }
-
-        // 自动打开结局详情弹窗（空值容错）
-        function openDetailModalByEnd(endData) {
-            modalTitle.textContent = endData.name || '无结局名称';
-            modalDetail.textContent = endData.detail || '此结局暂无详细介绍...';
-            detailModal.style.display = 'flex';
-        }
-
-        // 事件委托（统一处理所有点击事件）
-        document.addEventListener('click', (e) => {
-            // level2选择事件
-            if (e.target.closest('#level2-step .option')) {
-                handleLevel2Select(e);
-            }
-            // level3选择事件
-            if (e.target.closest('#level3-step .option')) {
-                handleLevel3Select(e);
-            }
-            // 回退按钮事件
-            if (e.target.classList.contains('back-btn')) {
-                handleBackBtn(e);
-            }
-            // 结局选项点击（打开弹窗）
-            if (e.target.closest('#level5-step .option')) {
-                openDetailModal(e);
-            }
-            // 剧情选择事件
-            if (e.target.closest('.plot-option')) {
-                handlePlotChoice(e);
-            }
-        });
-
-        // 回退按钮处理函数（完全重置状态+恢复初始介绍）
-        function handleBackBtn(e) {
-            const target = e.target.dataset.target;
-            switch(target) {
-                case 'root': 
-                    // 完全重置所有状态
-                    Object.keys(selectState).forEach(key => selectState[key] = '');
-                    level2Step.style.display = 'none';
-                    level3Step.style.display = 'none';
-                    level4Step.style.display = 'none';
-                    plotChoiceStep.style.display = 'none';
-                    level5Step.style.display = 'none';
-                    rootStep.querySelectorAll('.option').forEach(item => item.classList.remove('selected'));
-                    // 恢复根功法初始剧情介绍
-                    document.getElementById('root-intro').innerHTML = `<h4>剧情背景</h4><p>你本是青岚宗外门弟子，因偶得上古秘境传承，需从四大至高根功法中择一修行，此选择将决定你一生的修仙轨迹，仙魔两道，一念之间...</p>`;
-                    break;
-                case 'level2': 
-                    selectState.level3 = '';
-                    selectState.plotChoice = '';
-                    level3Step.style.display = 'none';
-                    level4Step.style.display = 'none';
-                    plotChoiceStep.style.display = 'none';
-                    level5Step.style.display = 'none';
-                    level2Step.querySelectorAll('.option').forEach(item => item.classList.remove('selected'));
-                    break;
-                case 'level3': 
-                    selectState.plotChoice = '';
-                    level4Step.style.display = 'none';
-                    plotChoiceStep.style.display = 'none';
-                    level5Step.style.display = 'none';
-                    level3Step.querySelectorAll('.option').forEach(item => item.classList.remove('selected'));
-                    break;
-                case 'level4': 
-                    selectState.plotChoice = '';
-                    plotChoiceStep.style.display = 'none';
-                    level5Step.style.display = 'none';
-                    break;
-            }
-        }
-
-        // 打开结局详情弹窗（空值容错）
-        function openDetailModal(e) {
-            const { rootKey, level2, level3 } = selectState;
-            const level3List = storyData[rootKey]?.level3?.[level2] || [];
-            const currentLevel3 = level3List.find(item => item.name === level3);
-            const level5List = currentLevel3?.level5 || [];
-            const targetId = parseInt(e.target.dataset.id) || parseInt(e.target.closest('.option').dataset.id);
-            const currentLevel5 = level5List.find(item => item.id === targetId);
-            
-            if (currentLevel5) {
-                modalTitle.textContent = currentLevel5.name || '无结局名称';
-                modalDetail.textContent = currentLevel5.detail || '此结局暂无详细介绍...';
-                detailModal.style.display = 'flex';
-            }
-        }
-
-        // 关闭弹窗相关事件（新增ESC快捷键）
-        closeModal.addEventListener('click', () => {
-            detailModal.style.display = 'none';
-        });
-        window.addEventListener('click', (e) => {
-            if (e.target === detailModal) {
-                detailModal.style.display = 'none';
-            }
-        });
-        document.addEventListener('keydown', (e) => {
-            // ESC快捷键关闭弹窗
-            if (e.key === 'Escape' && detailModal.style.display === 'flex') {
-                detailModal.style.display = 'none';
-            }
-        });
     </script>
 </body>
 </html>
