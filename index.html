@@ -11,7 +11,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta property="og:title" content="青岚宗秘境 - 修仙道途抉择">
-    <meta property="og:description" content="双秘术抉择，仙魔殊途，你的选择决定万古结局！">
+    <meta property="og:description" content="双秘术抉择，仙魔殊途，唯1好结局+1隐藏结局待你解锁！">
     <meta property="og:image" content="https://picsum.photos/id/1048/800/450">
     <meta property="og:type" content="game">
     <title>青岚宗秘境 · 三生道途抉择</title>
@@ -26,34 +26,28 @@
             min-height: 100vh;
             padding: 0;
             font-family: "微软雅黑", "PingFang SC", "Helvetica Neue", sans-serif;
-            /* 初始仙侠背景图 */
             background: url('https://picsum.photos/id/1031/1920/1080') no-repeat center center;
             background-size: cover;
             background-attachment: fixed;
             color: #2c3e50;
             -webkit-font-smoothing: antialiased;
-            /* 背景平滑切换动画 */
             transition: background 0.8s ease-in-out;
         }
-        /* 天魔策-暗红宗门背景 */
         body.bg-tianmo {
             background: url('https://picsum.photos/id/1043/1920/1080') no-repeat center center;
             background-size: cover;
             background-attachment: fixed;
         }
-        /* 星河令-星辰仙侠背景 */
         body.bg-xinghe {
             background: url('https://picsum.photos/id/1023/1920/1080') no-repeat center center;
             background-size: cover;
             background-attachment: fixed;
         }
-        /* 长生诀-仙门古风背景 */
         body.bg-changsheng {
             background: url('https://picsum.photos/id/1036/1920/1080') no-repeat center center;
             background-size: cover;
             background-attachment: fixed;
         }
-        /* 网易云音乐播放器 - 悬浮右上角不遮挡内容 */
         .music-player {
             position: fixed;
             top: 10px;
@@ -66,20 +60,18 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             backdrop-filter: blur(5px);
         }
-        /* 手机安全区适配 - 避免内容被刘海屏遮挡 */
         .status-bar {
             height: constant(safe-area-inset-top);
             height: env(safe-area-inset-top);
             background: rgba(0,0,0,0.3);
             backdrop-filter: blur(8px);
         }
-        /* 主容器 - 半透明保证文字清晰 */
         .container {
             width: 100%;
             min-height: calc(100vh - constant(safe-area-inset-top));
             min-height: calc(100vh - env(safe-area-inset-top));
             padding: 20px 15px;
-            background: rgba(255,255,255,0.92);
+            background: #ffffff;
             margin-top: 5px;
             border-radius: 12px 12px 0 0;
         }
@@ -91,7 +83,6 @@
             color: #2c3e50;
             font-weight: 600;
         }
-        /* 剧情步骤 - 默认隐藏，激活显示 */
         .step {
             display: none;
         }
@@ -99,12 +90,10 @@
             display: block;
             animation: fadeIn 0.3s ease-out;
         }
-        /* 步骤切换淡入动画 */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* 通用选项按钮 */
         .option {
             padding: 18px 20px;
             margin: 15px 0;
@@ -124,7 +113,6 @@
             transform: translateY(-2px);
             box-shadow: 0 3px 6px rgba(52, 152, 219, 0.3);
         }
-        /* 返回/重置按钮 */
         .back-btn, .reset-btn {
             padding: 12px 25px;
             margin: 20px 5px 10px;
@@ -141,7 +129,6 @@
             background: #c0392b;
             transform: translateY(-1px);
         }
-        /* 剧情文本框 */
         .plot-text {
             line-height: 2.2;
             margin: 15px 0;
@@ -153,7 +140,12 @@
             color: #2c3e50;
             text-align: justify;
         }
-        /* 结局倒计时提示 */
+        /* 隐藏结局专属文本样式 */
+        .hidden-ending {
+            color: #9b59b6;
+            font-weight: 600;
+            text-decoration: underline;
+        }
         .countdown-tip {
             color: #e74c3c;
             text-align: center;
@@ -173,7 +165,6 @@
             padding-bottom: 8px;
             font-weight: 600;
         }
-        /* 秘术选择按钮 - 专属样式 */
         .skill-btn {
             background: #f5f0ff;
             border: 2px solid #9b59b6;
@@ -185,7 +176,6 @@
             color: white;
             border-color: #9b59b6;
         }
-        /* 适配小屏手机 */
         @media (max-width: 375px) {
             .container {
                 padding: 15px 10px;
@@ -204,7 +194,6 @@
     </style>
 </head>
 <body>
-    <!-- 网易云音乐外链 - 西瓜JUN《至尊》（自动循环+本地兼容） -->
     <div class="music-player">
         <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="100%" 
         src="https://music.163.com/outchain/player?type=2&id=1861403382&auto=1&height=32"
@@ -213,27 +202,23 @@
         </iframe>
     </div>
 
-    <!-- 手机安全区 -->
     <div class="status-bar"></div>
-    <!-- 主内容容器 -->
     <div class="container">
         <h2>青岚宗秘境 · 三生道途抉择</h2>
 
-        <!-- 步骤1：择无上根法（初始页面） -->
         <div class="step active" id="step1">
             <h3>第一步：叩问本心，择无上根法</h3>
             <div class="plot-text">
                 你是青岚宗外门弟子，因误入后山「锁灵渊」，失足坠入万丈崖底，竟撞开尘封三千年的上古秘境。
                 秘境穹顶悬着三道流光，化作三本古朴古籍：<br>
                 一本嵌满碎星，星力呼啸欲裂；一本萦绕淡金霞光，寿元气息沁人心脾；一本裹着浓浓血雾，魔威直冲神魂。
-                崖底传来苍老低语：「三法择一，道途既定，仙魔殊途，再无回头。」
+                崖底传来苍老低语：「三法择一，道途既定，仙魔殊途，唯1好结局+1隐藏结局待你解锁，其余皆为身死道消...」
             </div>
             <div class="option" data-root="星河令" data-bg="bg-xinghe">星河令 - 御星算天，引星辰之力铸不灭道基</div>
             <div class="option" data-root="长生诀" data-bg="bg-changsheng">长生诀 - 炼体延寿，聚天地灵气筑不朽肉身</div>
             <div class="option" data-root="天魔策" data-bg="bg-tianmo">天魔策 - 噬血噬魂，吞万灵精魄成魔道至尊</div>
         </div>
 
-        <!-- 步骤2：择分支精修 -->
         <div class="step" id="step2">
             <h3>第二步：法随心动，择分支精修</h3>
             <div class="plot-text" id="plot2"></div>
@@ -241,15 +226,13 @@
             <button class="back-btn" onclick="showStep('step1')">返回重择根法</button>
         </div>
 
-        <!-- 步骤3：择核心秘术（双选项） -->
         <div class="step" id="step3">
             <h3>第三步：凝心悟道，择核心秘术</h3>
-            <div class="plot-text" id="plot3">选定流派后，丹田内浮现两道秘术灵光，皆为该流派无上绝学，择其一精修，道途截然不同！</div>
+            <div class="plot-text" id="plot3">选定流派后，丹田内浮现两道秘术灵光，皆为该流派无上绝学，择其一精修，道途截然不同！唯有特定抉择可解锁好结局与隐藏结局。</div>
             <div id="skill-option"></div>
             <button class="back-btn" onclick="showStep('step2')">返回重择流派</button>
         </div>
 
-        <!-- 步骤4：生死关头抉择 -->
         <div class="step" id="step4">
             <h3>第四步：生死关头，决命运走向</h3>
             <div class="plot-text" id="plot4"></div>
@@ -258,171 +241,231 @@
             <button class="back-btn" onclick="showStep('step3')">返回重选秘术</button>
         </div>
 
-        <!-- 步骤5：最终结局 -->
         <div class="step" id="step5">
             <h3>终局：道途既定，看万古荣光</h3>
             <div class="plot-text" id="plot5"></div>
-            <button class="reset-btn" onclick="resetAll()">重踏仙途，再择机缘</button>
+            <button class="reset-btn" onclick="resetAll()">重踏仙途，再寻机缘</button>
         </div>
     </div>
 
     <script>
-        // 核心剧情数据 - 三大根法+双流派+双秘术+多结局
+        // 负面结局随机池（每个根法共用，避免重复）
+        const badEndings = [
+            "你道心不坚，在抉择中迷失方向，神魂被天地规则碾碎，身死道消，万古不留名",
+            "功法反噬，经脉寸断，修为尽散，最终沦为凡夫俗子，在病痛中孤独终老",
+            "贪心不足，强行催动秘术，引动天劫降临，肉身被天雷劈成飞灰，魂飞魄散",
+            "被心魔入侵，神智错乱，屠戮生灵，最终被正道修士围剿，形神俱灭",
+            "秘术修炼失败，丹田破碎，沦为废人，在宗门底层受尽屈辱，郁郁而终",
+            "误触秘境禁制，被上古杀阵绞杀，连残魂都未能留下，彻底湮灭于天地间"
+        ];
+
+        // 核心剧情数据（优化后触发路径）
         const immortalData = {
-            星河令: [
-                {
-                    flow:"御星流", 
-                    plot2:"你指尖触碰到《星河令》，刹那间漫天星屑涌入丹田，识海浮现亿万星辰图谱。古籍化作一道星虹，在你经脉中流转，所过之处窍穴尽通。守陵长老虚影浮现：「御星者，可引星力攻伐，亦可借星轨推演，你选哪条路？」",
-                    skills: [
-                        {
-                            name:"星辰御天诀", 
-                            realm:"星辰皇", 
-                            plot4:"你引星力灌体，境界突破至星辰皇，周身七星环缭绕，威压震慑秘境。忽然，秘境穹顶裂开星门，上古星神残魂走出：「吾乃星界之主，奉吾为主，赐你星军兵权；若抗，神魂化星屑，永世不得超生！」",
-                            choices:["俯首叩拜，奉星神为主，愿掌星界兵权", "拔剑怒喝，反抗星神威压，誓守自身道心"],
-                            ends:["你成星神座下第一战神，掌百万星军，威慑诸天万界，你的名号成了星空生灵的禁忌", "你以道心硬撼星神残魂，九死一生悟得「星主自身」，从此执掌命运，逍遥于星空之外"]
-                        },
-                        {
-                            name:"星陨七杀诀", 
-                            realm:"星陨帝", 
-                            plot4:"你以陨星力炼体，境界突破至星陨帝，手中陨星杀剑引动漫天陨石，天地色变。星界执法者踏星而来，手持星罚之链：「你杀伐过重，违逆星界规则，要么自废修为受罚，要么以力抗罚，血战星界！」",
-                            choices:["自废三成修为，接受星罚，暂避杀劫", "执陨星杀剑，血战星界执法者，誓不低头"],
-                            ends:["你自废三成修为，星罚消散，从此收敛杀伐，以星力守护一方，成了星空守护者", "你血战星界执法者，斩落数人，却引动星核自爆，肉身陨灭，仅剩一缕残魂遁入星云，永世漂泊"]
-                        }
-                    ]
-                },
-                {
-                    flow:"星算流", 
-                    plot2:"《星河令》融入你眉心，识海化作一片星图，每一颗星辰都对应着一人一界的命运。你闭眼推演，竟能看到宗门弟子的生老病死。守陵长老虚影轻叹：「星算者，可窥天机，亦可改命，你敢踏这逆天之路吗？」",
-                    skills: [
-                        {
-                            name:"逆天改命诀", 
-                            realm:"改命皇", 
-                            plot4:"你掐诀推演，一口鲜血喷在星盘上，三千年后邪魔降世的浩劫清晰浮现。眉心星印发烫，寿元飞速流逝，守陵长老低语：「要么耗寿元推破劫之法，要么封星盘隐世，任天地倾覆。」",
-                            choices:["燃尽千年寿元，推演破劫之法，救亿万苍生", "封印命运星盘，隐世不出，只求自身逍遥"],
-                            ends:["你以千年寿元换破劫之策，九州生灵存续，你化作观星台石像，受万世香火供奉", "你隐于星空深处，浩劫降临九州破碎，你成了天道不容的孤魂，永世漂泊"]
-                        },
-                        {
-                            name:"星轨推演术", 
-                            realm:"星算帝", 
-                            plot4:"你以星轨推演自身道途，竟看到自己三日后将遭雷劫劈身，魂飞魄散。唯一的生路：要么借星盘遮蔽天机，隐于世俗避劫；要么引雷劫入体，以星力炼魂，逆天改命。",
-                            choices:["遮蔽天机，隐于世俗市井，暂避雷劫", "引雷劫入体，以星力炼魂，赌一场逆天机缘"],
-                            ends:["你遮蔽天机隐于世俗，雷劫落空，你在人间活了千年，看尽沧海桑田，寿终正寝", "你引雷劫炼魂，魂体大成，突破星算帝极限，成了天道推演不透的存在，逍遥于三界之外"]
-                        }
-                    ]
-                }
-            ],
-            长生诀: [
-                {
-                    flow:"固本流", 
-                    plot2:"《长生诀》化作一道金光，钻入你的四肢百骸，你能清晰感受到，每一寸肌肉都在变强，每一滴血液都在焕发活力。守陵长老虚影抚须笑道：「固本者，炼体为先，九转涅槃后，肉身可堪比仙器，你可愿受这涅槃之苦？」",
-                    skills: [
-                        {
-                            name:"九转固元功", 
-                            realm:"固元圣境", 
-                            plot4:"你踏入丹火池准备第九转涅槃，丹火灼烧肉身时，神魂如风中残烛。守陵长老声音响起：「要么压制丹火温养神魂百年，要么强行冲关，赌不死金身机缘。」",
-                            choices:["压制丹火，温养神魂百年，待稳固后再涅槃", "引动全部丹火，强行冲关，誓修不死金身"],
-                            ends:["你温养神魂百年，涅槃圆满，修成不死金身，成世间唯一肉身圣人，受万族朝拜", "你强行冲关，神魂被丹火焚毁，虽有金刚之躯，却沦为炼体痴儿，终日奔走于山林"]
-                        },
-                        {
-                            name:"金刚不坏身", 
-                            realm:"金刚帝", 
-                            plot4:"你炼就金刚不坏身，肉身硬抗三次天劫而无伤，却发现自己的七情六欲正在逐渐消散，即将成为无心的长生傀儡。唯一选择：要么自废一成肉身，解封神魂；要么彻底封魂，成无心长生之躯。",
-                            choices:["自废一成肉身，解封神魂，保留七情六欲", "彻底封魂，成无心之躯，享永恒长生"],
-                            ends:["你解封神魂，虽失一成肉身，却保留七情六欲，成金刚帝，逍遥天地间，寿元五千年", "你彻底封魂，成无心长生之躯，肉身不朽，活过万古，却成了冰冷的长生傀儡，无人问津"]
-                        }
-                    ]
-                },
-                {
-                    flow:"延寿流", 
-                    plot2:"《长生诀》融入你的丹田，化作一枚寿元果，你的寿元瞬间暴涨至千年。你站在镜前，竟发现鬓角的白发悄然变黑。守陵长老虚影叹道：「延寿者，可享千年岁月，却也会引来天劫觊觎，你敢逆天增寿吗？」",
-                    skills: [
-                        {
-                            name:"千寿延年经", 
-                            realm:"千寿真君", 
-                            plot4:"你寿元累积至八千年，天际雷云汇聚，紫金雷龙俯冲而下。守陵长老低语：「要么散去千年寿元化解天劫，要么催动寿元硬抗，破天道桎梏。」",
-                            choices:["散去千年寿元，化解天劫，安享八百年逍遥", "催动八千年寿元，硬撼雷龙，誓破天道桎梏"],
-                            ends:["你散去千年寿元，天劫退去，成天地寿星，八百年游遍名山大川，寿终正寝时天地落泪", "你以寿元硬抗雷龙，肉身被撕碎，神魂遁入不老泉，触怒天威，魂飞魄散"]
-                        },
-                        {
-                            name:"天地养寿诀", 
-                            realm:"养寿帝", 
-                            plot4:"你借昆仑山脉灵气养寿，寿元达万年，却看到昆仑山脉三日后将因仙魔大战崩塌，你也会寿元尽散而亡。唯一选择：要么斩断灵根，另寻山川；要么以身护山，与昆仑共存亡。",
-                            choices:["斩断天地灵根，舍弃万年寿元，另寻山川养寿", "以身护山，催动寿元抵挡仙魔大战，与昆仑共存亡"],
-                            ends:["你斩断灵根，舍弃万年寿元，寻得江南小川养寿，寿元五千年，逍遥度日", "你以身护山，催动寿元抵挡仙魔，昆仑得以保全，你却寿元骤减，成昆仑山神，受万世敬仰"]
-                        }
-                    ]
-                }
-            ],
-            天魔策: [
-                {
-                    flow:"血魔流", 
-                    plot2:"《天魔策》化作一道血雾，钻入你的喉咙，一股嗜血的欲望在心底滋生。你低头看去，双手竟覆盖上一层血色鳞甲，指尖利爪闪烁着寒光。守陵长老虚影的声音带着寒意：「血魔者，以血为食，以杀为道，你可愿堕入魔道？」",
-                    skills: [
-                        {
-                            name:"万血噬魔功", 
-                            realm:"血魔帝", 
-                            plot4:"你站在仙魔结界前，怀中藏着圣兽精血，却远不及仙帝精血。仙界结界大开，仙帝瑶池设宴，夺血易如反掌，却会引来仙界诸神围剿。",
-                            choices:["撕裂结界，潜入瑶池，弑帝夺取仙帝精血", "放弃夺血，炼化圣兽精血，铸就不完美魔躯"],
-                            ends:["你弑帝夺血，铸就完美魔躯，统御魔界万族，仙神皆惧，成万古第一魔帝", "你炼化圣兽精血，魔躯虽有瑕疵，却威震魔界，镇守边疆，成魔道守护神"]
-                        },
-                        {
-                            name:"血河炼魔身", 
-                            realm:"血河帝", 
-                            plot4:"你引血河之水炼体，即将突破血河帝，却感受到血河之魂正在反噬自身，即将掌控你的意识。唯一选择：要么压制血河之魂，自废一成魔功；要么融合血河之魂，成血河之主。",
-                            choices:["压制血河之魂，自废一成魔功，保留自身意识", "融合血河之魂，成血河之主，掌魔界血河之力"],
-                            ends:["你压制血河之魂，保留意识，成血河帝，镇守血河边界，不扰三界，成魔道孤皇", "你融合血河之魂，成血河之主，掌魔界无尽血河，魔威撼天，仙魔两界皆不敢犯"]
-                        }
-                    ]
-                },
-                {
-                    flow:"噬魂流", 
-                    plot2:"《天魔策》钻入你的识海，无数魔物的魂魄在你脑海中嘶吼。你心念一动，便能吞噬身边的游魂，魂力暴涨。守陵长老虚影冷笑道：「噬魂者，可夺舍他人肉身，永生不死，你敢做这逆天之事吗？」",
-                    skills: [
-                        {
-                            name:"噬魂夺舍诀", 
-                            realm:"噬魂魔皇", 
-                            plot4:"你修成噬魂魔皇，魔躯却因征战受损，时日无多。恰逢昊天仙帝渡劫濒死、九幽魔主重伤垂危，两者皆是完美肉身，夺舍其一便可重生。",
-                            choices:["趁虚而入，夺舍昊天仙帝残躯，仙魔同体称霸", "潜入魔宫，夺舍九幽魔主肉身，威慑九天仙庭"],
-                            ends:["你夺舍仙帝残躯，仙魔同体，战力三界第一，称霸仙魔两界，万古无人敢撄其锋芒", "你夺舍魔主肉身，以噬魂之力威慑仙庭，仙界诸神闭门不出，你成魔界无上皇者"]
-                        },
-                        {
-                            name:"万魂融神诀", 
-                            realm:"万魂帝", 
-                            plot4:"你融合九千九百九十九道神魂，即将铸就万魂神体，却听到识海万魂嘶吼，自身意识正在逐渐迷失。唯一选择：要么舍弃千道神魂，稳固自身意识；要么融合最后一道神魂，成万魂帝，赌自身本心。",
-                            choices:["舍弃千道神魂，稳固自身意识，暂缓突破", "融合最后一道神魂，成万魂帝，以本心压制万魂"],
-                            ends:["你舍弃千道神魂，稳固意识，成九千魂帝，掌九千魂力，保留本心，逍遥魔界", "你融合万魂成帝，以强大本心压制万魂嘶吼，掌魔界万魂之力，成万魂之主，魔威盖世"]
-                        }
-                    ]
-                }
-            ]
+            星河令: {
+                // 好结局：逆势破局（星算流→逆天改命诀→舍己为人）- 贴合星算"窥天机、救苍生"特性
+                // 隐藏结局：星界独行（御星流→星陨七杀诀→坚守杀伐道）- 贴合御星"杀伐为道"却不盲从规则
+                branches: [
+                    {
+                        flow:"御星流", 
+                        plot2:"你指尖触碰到《星河令》，刹那间漫天星屑涌入丹田，识海浮现亿万星辰图谱。古籍化作一道星虹，在你经脉中流转，所过之处窍穴尽通。守陵长老虚影浮现：「御星者，可引星力攻伐，亦可借星轨推演，你选哪条路？」",
+                        skills: [
+                            {
+                                name:"星辰御天诀", 
+                                realm:"星辰皇", 
+                                plot4:"你引星力灌体，境界突破至星辰皇，周身七星环缭绕，威压震慑秘境。忽然，秘境穹顶裂开星门，上古星神残魂走出：「吾乃星界之主，奉吾为主，赐你星军兵权；若抗，神魂化星屑，永世不得超生！」",
+                                choices:["俯首叩拜，奉星神为主，愿掌星界兵权", "拔剑怒喝，反抗星神威压，誓守自身道心"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（盲从权威）
+                                    getRandomBadEnding()  // 负面结局（逆势却道心不足）
+                                ]
+                            },
+                            {
+                                name:"星陨七杀诀", 
+                                realm:"星陨帝", 
+                                plot4:"你以陨星力炼体，境界突破至星陨帝，手中陨星杀剑引动漫天陨石，天地色变。星界执法者踏星而来，手持星罚之链：「你杀伐过重，违逆星界规则，要么自废修为受罚，要么以力抗罚，血战星界！」",
+                                choices:["自废三成修为，接受星罚，暂避杀劫", "执陨星杀剑，血战星界执法者，誓不低头"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（妥协退让）
+                                    "<span class='hidden-ending'>你以杀伐道硬撼星界规则，虽未颠覆星界，却杀出一条独行之路，解锁「星界独行」隐藏结局，不属星神管辖，逍遥于星辰缝隙，战力万古无双</span>" // 隐藏结局
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        flow:"星算流", 
+                        plot2:"《星河令》融入你眉心，识海化作一片星图，每一颗星辰都对应着一人一界的命运。你闭眼推演，竟能看到宗门弟子的生老病死。守陵长老虚影轻叹：「星算者，可窥天机，亦可改命，你敢踏这逆天之路吗？」",
+                        skills: [
+                            {
+                                name:"逆天改命诀", 
+                                realm:"改命皇", 
+                                plot4:"你掐诀推演，一口鲜血喷在星盘上，三千年后邪魔降世的浩劫清晰浮现。眉心星印发烫，寿元飞速流逝，守陵长老低语：「要么耗寿元推破劫之法，要么封星盘隐世，任天地倾覆。」",
+                                choices:["燃尽千年寿元，推演破劫之法，救亿万苍生", "封印命运星盘，隐世不出，只求自身逍遥"],
+                                ends: [
+                                    "你以千年寿元换破劫之策，九州生灵存续，你虽寿元耗尽，却被天地认可，凝聚星辰道果，成「星算圣人」，万古敬仰（好结局）", // 好结局
+                                    getRandomBadEnding()  // 负面结局（自私避世）
+                                ]
+                            },
+                            {
+                                name:"星轨推演术", 
+                                realm:"星算帝", 
+                                plot4:"你以星轨推演自身道途，竟看到自己三日后将遭雷劫劈身，魂飞魄散。唯一的生路：要么借星盘遮蔽天机，隐于世俗避劫；要么引雷劫入体，以星力炼魂，逆天改命。",
+                                choices:["遮蔽天机，隐于世俗市井，暂避雷劫", "引雷劫入体，以星力炼魂，赌一场逆天机缘"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（逃避劫数）
+                                    getRandomBadEnding()  // 负面结局（赌性过重，魂体俱灭）
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            长生诀: {
+                // 好结局：守正出奇（固本流→金刚不坏身→保留七情）- 贴合长生"炼体不炼心"，坚守人性
+                // 隐藏结局：自然共生（延寿流→千寿延年经→顺天应命）- 贴合延寿"顺天地、合自然"，不逆天硬抗
+                branches: [
+                    {
+                        flow:"固本流", 
+                        plot2:"《长生诀》化作一道金光，钻入你的四肢百骸，你能清晰感受到，每一寸肌肉都在变强，每一滴血液都在焕发活力。守陵长老虚影抚须笑道：「固本者，炼体为先，九转涅槃后，肉身可堪比仙器，你可愿受这涅槃之苦？」",
+                        skills: [
+                            {
+                                name:"九转固元功", 
+                                realm:"固元圣境", 
+                                plot4:"你踏入丹火池准备第九转涅槃，丹火灼烧肉身时，神魂如风中残烛。守陵长老声音响起：「要么压制丹火温养神魂百年，要么强行冲关，赌不死金身机缘。」",
+                                choices:["压制丹火，温养神魂百年，待稳固后再涅槃", "引动全部丹火，强行冲关，誓修不死金身"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（急于求成反遭反噬）
+                                    getRandomBadEnding()  // 负面结局（温养过久，错失机缘）
+                                ]
+                            },
+                            {
+                                name:"金刚不坏身", 
+                                realm:"金刚帝", 
+                                plot4:"你炼就金刚不坏身，肉身硬抗三次天劫而无伤，却发现自己的七情六欲正在逐渐消散，即将成为无心的长生傀儡。唯一选择：要么自废一成肉身，解封神魂；要么彻底封魂，成无心长生之躯。",
+                                choices:["自废一成肉身，解封神魂，保留七情六欲", "彻底封魂，成无心之躯，享永恒长生"],
+                                ends: [
+                                    "你解封神魂，虽失一成肉身，却保留七情六欲，以「有情之躯修无情炼体」，成金刚帝，逍遥天地间，寿元五千年，被称为「人间活仙」（好结局）", // 好结局
+                                    getRandomBadEnding()  // 负面结局（无心则无魂，沦为躯壳）
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        flow:"延寿流", 
+                        plot2:"《长生诀》融入你的丹田，化作一枚寿元果，你的寿元瞬间暴涨至千年。你站在镜前，竟发现鬓角的白发悄然变黑。守陵长老虚影叹道：「延寿者，可享千年岁月，却也会引来天劫觊觎，你敢逆天增寿吗？」",
+                        skills: [
+                            {
+                                name:"千寿延年经", 
+                                realm:"千寿真君", 
+                                plot4:"你寿元累积至八千年，天际雷云汇聚，紫金雷龙俯冲而下。守陵长老低语：「要么散去千年寿元化解天劫，要么催动寿元硬抗，破天道桎梏。」",
+                                choices:["散去千年寿元，化解天劫，安享八百年逍遥", "催动八千年寿元，硬撼雷龙，誓破天道桎梏"],
+                                ends: [
+                                    "<span class='hidden-ending'>你顺天应命散去千年寿元，却因心境圆满被天地馈赠「自然寿元」，解锁「自然共生」隐藏结局，寿元随天地流转，无天劫困扰，逍遥世间万载</span>", // 隐藏结局
+                                    getRandomBadEnding()  // 负面结局（硬抗天道，魂飞魄散）
+                                ]
+                            },
+                            {
+                                name:"天地养寿诀", 
+                                realm:"养寿帝", 
+                                plot4:"你借昆仑山脉灵气养寿，寿元达万年，却看到昆仑山脉三日后将因仙魔大战崩塌，你也会寿元尽散而亡。唯一选择：要么斩断灵根，另寻山川；要么以身护山，与昆仑共存亡。",
+                                choices:["斩断天地灵根，舍弃万年寿元，另寻山川养寿", "以身护山，催动寿元抵挡仙魔大战，与昆仑共存亡"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（斩断灵根，寿元骤减而亡）
+                                    getRandomBadEnding()  // 负面结局（护山失败，同归于尽）
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            天魔策: {
+                // 好结局：魔心守正（噬魂流→噬魂夺舍诀→不贪仙帝躯）- 贴合魔道"夺舍却不嗜杀"的反差感
+                // 隐藏结局：血河守界（血魔流→血河炼魔身→融合却不迷失）- 贴合血魔"控血河却掌本心"的高阶玩法
+                branches: [
+                    {
+                        flow:"血魔流", 
+                        plot2:"《天魔策》化作一道血雾，钻入你的喉咙，一股嗜血的欲望在心底滋生。你低头看去，双手竟覆盖上一层血色鳞甲，指尖利爪闪烁着寒光。守陵长老虚影的声音带着寒意：「血魔者，以血为食，以杀为道，你可愿堕入魔道？」",
+                        skills: [
+                            {
+                                name:"万血噬魔功", 
+                                realm:"血魔帝", 
+                                plot4:"你站在仙魔结界前，怀中藏着圣兽精血，却远不及仙帝精血。仙界结界大开，仙帝瑶池设宴，夺血易如反掌，却会引来仙界诸神围剿。",
+                                choices:["撕裂结界，潜入瑶池，弑帝夺取仙帝精血", "放弃夺血，炼化圣兽精血，铸就不完美魔躯"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（弑帝遭围剿）
+                                    getRandomBadEnding()  // 负面结局（魔躯有瑕，遭心魔反噬）
+                                ]
+                            },
+                            {
+                                name:"血河炼魔身", 
+                                realm:"血河帝", 
+                                plot4:"你引血河之水炼体，即将突破血河帝，却感受到血河之魂正在反噬自身，即将掌控你的意识。唯一选择：要么压制血河之魂，自废一成魔功；要么融合血河之魂，成血河之主。",
+                                choices:["压制血河之魂，自废一成魔功，保留自身意识", "融合血河之魂，成血河之主，掌魔界血河之力"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（自废魔功，沦为魔道底层）
+                                    "<span class='hidden-ending'>你以强大魔心融合血河之魂却不迷失，解锁「血河守界」隐藏结局，掌魔界血河之力，却以血河为界隔绝魔祸，成魔道罕见的「守界魔帝」，仙魔两界皆不敢犯</span>" // 隐藏结局
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        flow:"噬魂流", 
+                        plot2:"《天魔策》钻入你的识海，无数魔物的魂魄在你脑海中嘶吼。你心念一动，便能吞噬身边的游魂，魂力暴涨。守陵长老虚影冷笑道：「噬魂者，可夺舍他人肉身，永生不死，你敢做这逆天之事吗？」",
+                        skills: [
+                            {
+                                name:"噬魂夺舍诀", 
+                                realm:"噬魂魔皇", 
+                                plot4:"你修成噬魂魔皇，魔躯却因征战受损，时日无多。恰逢昊天仙帝渡劫濒死、九幽魔主重伤垂危，两者皆是完美肉身，夺舍其一便可重生。",
+                                choices:["趁虚而入，夺舍昊天仙帝残躯，仙魔同体称霸", "潜入魔宫，夺舍九幽魔主肉身，威慑九天仙庭"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（夺舍仙帝遭仙神追杀）
+                                    "你放弃称霸之念，夺舍九幽魔主肉身却不嗜杀，以魔威震慑魔道乱党，护一方魔界安宁，成「魔心守正」的魔道至尊，万古传颂（好结局）" // 好结局
+                                ]
+                            },
+                            {
+                                name:"万魂融神诀", 
+                                realm:"万魂帝", 
+                                plot4:"你融合九千九百九十九道神魂，即将铸就万魂神体，却听到识海万魂嘶吼，自身意识正在逐渐迷失。唯一选择：要么舍弃千道神魂，稳固自身意识；要么融合最后一道神魂，成万魂帝，赌自身本心。",
+                                choices:["舍弃千道神魂，稳固自身意识，暂缓突破", "融合最后一道神魂，成万魂帝，以本心压制万魂"],
+                                ends: [
+                                    getRandomBadEnding(), // 负面结局（舍弃过多，魂力大减而亡）
+                                    getRandomBadEnding()  // 负面结局（融合失控，被万魂吞噬）
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         };
 
-        let currentFlow = null; // 存储当前选定的流派
+        let currentFlow = null;
 
-        // 显示指定步骤，隐藏其他步骤
+        // 随机获取负面结局（避免重复）
+        function getRandomBadEnding() {
+            const randomIndex = Math.floor(Math.random() * badEndings.length);
+            return badEndings[randomIndex];
+        }
+
         function showStep(stepId) {
             document.querySelectorAll(".step").forEach(step => step.classList.remove("active"));
             document.getElementById(stepId).classList.add("active");
         }
 
-        // 根功法选择 - 绑定背景切换+流派渲染
+        // 根功法选择 - 渲染流派
         document.querySelectorAll("[data-root]").forEach(btn => {
             btn.onclick = function() {
                 const root = this.dataset.root;
                 const bgClass = this.dataset.bg;
-                // 切换道途专属背景
                 document.body.className = bgClass;
-                // 渲染对应流派选项
                 const flowBox = document.getElementById("flow-options");
                 flowBox.innerHTML = "";
-                immortalData[root].forEach(flow => {
+                immortalData[root].branches.forEach(flow => {
                     const div = document.createElement("div");
                     div.className = "option";
                     div.innerText = flow.flow;
                     div.onclick = () => {
                         currentFlow = flow;
                         document.getElementById("plot2").innerText = flow.plot2;
-                        renderSkills(); // 渲染秘术选项
+                        renderSkills();
                         showStep("step3");
                     };
                     flowBox.appendChild(div);
@@ -431,7 +474,7 @@
             };
         });
 
-        // 渲染秘术选项（双秘术）
+        // 渲染秘术选项
         function renderSkills() {
             const skillBox = document.getElementById("skill-option");
             skillBox.innerHTML = "";
@@ -445,7 +488,7 @@
             });
         }
 
-        // 渲染剧情抉择选项
+        // 渲染剧情抉择
         function renderChoice(skill) {
             document.getElementById("plot4").innerText = skill.plot4;
             const choiceBox = document.getElementById("choice-options");
@@ -455,30 +498,28 @@
                 div.className = "option";
                 div.innerText = choice;
                 div.onclick = () => showEnding(skill.ends[idx]);
+                choiceBox.appendChild(div);
             });
             showStep("step4");
         }
 
-        // 显示结局（带3秒倒计时）
+        // 显示结局（支持HTML格式渲染隐藏结局样式）
         function showEnding(endText) {
             const countdown = document.getElementById("countdown");
             countdown.style.display = "block";
-            // 倒计时文本切换
             setTimeout(() => countdown.innerHTML = "抉择已定，2秒后揭晓最终道途...", 1000);
             setTimeout(() => countdown.innerHTML = "抉择已定，1秒后揭晓最终道途...", 2000);
-            // 3秒后显示结局
             setTimeout(() => {
-                document.getElementById("plot5").innerText = endText;
+                document.getElementById("plot5").innerHTML = endText; // 用innerHTML支持HTML样式
                 showStep("step5");
                 countdown.style.display = "none";
             }, 3000);
         }
 
-        // 重置所有状态（返回初始页面+恢复初始背景）
         function resetAll() {
-            document.body.className = ""; // 清空背景类名，恢复初始背景
-            currentFlow = null; // 清空当前流派
-            showStep("step1"); // 返回根功法选择页
+            document.body.className = "";
+            currentFlow = null;
+            showStep("step1");
         }
     </script>
 </body>
